@@ -1,0 +1,122 @@
+{% extends "base.html" %}
+{% load staticfiles %}
+{% block head-title %}pyPerc dashboard{% endblock %}
+{% block body-content %}
+<h1>pyPerc status</h1>
+
+<div class="row">
+    <div class="col-sm-5">
+        <h3>Adapter</h3>
+        <dl class="dl-horizontal" data-bind="with: adapter">
+            <dt>product</dt><dd data-bind="text: product"></dd>
+            <dt>firmware</dt><dd data-bind="text: firmware"></dd>
+            <dt>portcount</dt><dd data-bind="text: portcount"></dd>
+            <dt>bbu</dt><dd data-bind="text: has_bbu ? 'present' : 'none'"></dd>
+            <dt>alarm</dt><dd data-bind="text: has_alarm?'present':'none'"></dd>
+            <dt>memsize</dt><dd data-bind="text: memory_size"></dd>
+        </dl>
+    </div>
+
+    <div class="col-sm-7">
+        <h3>Volumes</h3>
+        <table class="table table-condensed table-striped">
+        <thead><tr>
+                <th></th>
+            <th class="text-center">id</th>
+            <th class="text-center">name</th>
+            <th class="text-center">raid level</th>
+            <th class="text-center">size</th>
+            <th class="text-center">state</th>
+            <th class="text-center">stripe</th>
+        </tr></thead>
+        <tbody data-bind="foreach: volumes">
+        <tr>
+            <td class="text-center"><i class="fa fa-database fa-2x"></i></td>
+            <td class="text-center" data-bind="text: id"></td>
+            <td class="text-center" data-bind="text: name"></td>
+            <td class="text-center" data-bind="text: raid_level"></td>
+            <td class="text-right"  data-bind="text: size"></td>
+            <td class="text-center" data-bind="text: state, css: {'text-success': state==='optimal', 'text-danger': state!=='optimal'}"></td>
+            <td class="text-center" data-bind="text: stripe + ' KB'"></td>
+        </tr>
+        </tbody>
+        </table>
+    </div>
+    
+</div>
+
+<div class="row">
+<div class="col-xs-12">
+
+<h3>Devices</h3>
+<table class="table table-bordered table-compact">
+    <tbody data-bind="foreach: devices">
+    <tr>
+        <td class="text-center" style="background: #113355;"><span style="font-size: 32px;" data-bind="text: slot"></span></td>
+        <td>
+        <div class="row" style="border-bottom:2px solid #113355;">
+            <div class="col-sm-1">
+                <p style="margin-bottom: 0; padding-bottom: 0;" class="text-center">
+                    <i class="fa fa-hdd-o fa-4x" data-bind="css: {'text-success': state=='online', 'text-warning': state=='unconfigured-bad'}"></i>
+                </p>
+                <p class="text-center" style="font-size: 16px;" data-bind="text: type"></p>
+            </div>
+            <div class="col-sm-2">
+                <p class="text-center"><strong data-bind="text: state"></strong></p>
+                <p class="text-center">
+                <span data-bind="if: errors_media">Media Errors: <strong data-bind="text: errors_media"></strong></span><br>
+                <!--Other Errors: <strong data-bind="text: errors_other"></strong></p>-->
+            </div>
+
+            <div class="col-sm-4">
+                <p>
+                <span class="text-primary" data-bind="if: member">Member of Volume #<span data-bind="text: volume"></span></span>
+                <span data-bind="if: !member">Unassigned</span>
+                </p>
+                <p>
+                Raw sectors: <strong data-bind="text: numberWithCommas(size_raw)"></strong><br>
+                Size: <strong data-bind="text: numberWithCommas(sectorsToMB(size_raw))"></strong> MB
+                </p>
+            </div>
+            <div class="col-sm-3">
+                <p>
+                Model: <strong data-bind="text: inq_model"></strong><br>
+                Serial: <strong data-bind="text: inq_serial"></strong><br>
+                Firmware: <strong data-bind="text: firmware_level"></strong>
+                </p>
+            </div>
+        </div><!-- row -->
+        </td>
+    </tr></tbody>
+</table>
+</div>
+</div>
+
+
+<h3>Events</h3>
+<div class="row">
+<table class="table table-striped table-bordered table-condensed">
+<thead><tr>
+    <th>id</th>
+    <th class="text-center">date</th>
+    <th class="text-center">time</th>
+    <th class="text-center">code</th>
+    <th class="text-left">description</th>
+</tr></thead>
+<tbody data-bind="foreach: events">
+<tr>
+    <td class="text-center" data-bind="text: id"></td>
+    <td class="text-center" data-bind="text: moment(time).format('MMM Do YYYY')"></td>
+    <td class="text-center" data-bind="text: moment(time).format('HH:mm:ss')"></td>
+    <td class="text-center" data-bind="text: code"></td>
+    <td class="text-left" data-bind="text: description, css:{'text-primary':level==1,'text-warning':level==2,'text-danger':level==3}"></td>
+</tr>
+</tbody>
+</table>
+</div>
+{% endblock %}
+{% block end-html %}
+<script type="text/javascript" src="{% static "dashboard.js" %}"></script>
+<script type="text/javascript">
+</script>
+{% endblock %}

@@ -1,0 +1,68 @@
+{% load staticfiles %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0">
+    <title>{% block head-title %}{{ main_title }}{% endblock %}</title>
+
+    <!-- bootstrap -->
+    <link rel="stylesheet" href="{% static "bootswatch/superhero/bootstrap.min.css" %}">
+    <link rel="stylesheet" href="{% static "fontawesome/css/font-awesome.min.css" %}">
+
+    {% block head-content %}{% endblock %}
+</head>
+<body>
+<div class="container">
+
+{% block body-content %}{% endblock %}
+
+</div>
+
+<script src="{% static "jquery/dist/jquery.min.js" %}"></script>
+<script src="{% static "bootstrap/dist/js/bootstrap.min.js" %}"></script>
+<script src="{% static "knockout/dist/knockout.js" %}"></script>
+<script src="{% static "moment/min/moment.min.js" %}"></script>
+
+
+<script type="text/javascript">
+$(document).ajaxSend(function(event,xhr,settings) {
+    function getCookie(name) {
+        var cookieValue = null;
+        if (document.cookie && document.cookie != '') {
+            var cookies = document.cookie.split(';');
+            for (var i=0; i<cookies.length; i++) {
+                var cookie = jQuery.trim(cookies[i]);
+                if ( cookie.substring(0,name.length+1)==(name+'=') ) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length+1)); break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
+    function sameOrigin(url) {
+        var host = document.location.host;
+        var protocol = document.location.protocol;
+        var sr_origin = '//' + host;
+        var origin = protocol + sr_origin;
+        return (url==origin || url.slice(0,origin.length+1)==origin+'/') ||
+            (url==sr_origin||url.slice(0,sr_origin.length+1)==sr_origin+'/') ||
+            !(/^(\/\/|http:https:).*/.test(url));
+    }
+
+    function safeMethod(method) {
+        return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+    }
+
+    if (!safeMethod(settings.type) && sameOrigin(settings.url)) {
+        xhr.setRequestHeader("X-CSRFToken",getCookie('csrftoken'));
+    }
+});
+</script>
+
+{% block end-html %}{% endblock %}
+
+</body>
+</html>
