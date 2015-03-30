@@ -6,7 +6,7 @@ import json
 import time
 import pprint
 import subprocess
-from datetime import datetime
+from datetime import datetime, timedelta
 
 MEGACLI_EXE = '/usr/local/sbin/megacli'
 #MEGACLI = '/usr/sbin/megacli'
@@ -20,6 +20,12 @@ EVENTSPOOL = DATAPATH + '/events'
 
 from codetable import codetable
 from decoders  import *
+
+MEGADATE_FORMAT = "%Y-%m-%dT%H:%M:%S"
+def from_megadate(val):
+    return datetime.strptime(val, MEGADATE_FORMAT)
+def to_megadate(val):
+    return val.strftime(MEGADATE_FORMAT)
 
 def megarun(params):
 
@@ -93,6 +99,17 @@ class perc(object):
             self.last_event = max(self.events, key=lambda item: item['id'])
         except ValueError:
             self.last_event = 0
+
+        # patrol for events without timestamps, and try to create them
+        for item in self.events:
+            if item['code'] == 44:
+                chunks = item['event_data'].split("\n")
+                chunk = chunks[0]
+                timeset_seconds = int(chunk.split(' ')[-1])
+                timeset_datetime = from_megadate(item['time'])
+            elif 'sslr' in item:
+                adjustment = timedelta(seconds=(timeset_seconds - item['sslr']))
+                item['time'] = to_megadate(timeset_datetime - adjustment)
 
 #        print 'last event in ram:', self.last_event
         
