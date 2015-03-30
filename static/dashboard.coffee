@@ -1,5 +1,6 @@
 
 MAX_EVENTS = 50
+EVENT_POLLING_PERIOD = 4000
 
 delay = (ms, func) -> setTimeout func, ms
 
@@ -34,16 +35,18 @@ class ViewModel
         $.each data.events.reverse(), (idx, item) =>
           @last_event = Math.max @last_event, item.id
           @events.push item
-        delay 4000, @pollEvents
+        delay EVENT_POLLING_PERIOD, @pollEvents
 
     @pollEvents = =>
       $.get('/api/events/', {since: @last_event}, (data, status) =>
-        $.each data.events, (idx, item) =>
+        $.each(data.events, (idx, item) =>
           @last_event = Math.max @last_event, item.id
           @events.unshift item
           if @events().length > MAX_EVENTS
             @events.pop
-        delay 4000, @pollEvents
+        )
+      ).always(=>
+        delay EVENT_POLLING_PERIOD, @pollEvents
       )
 
 vm = new ViewModel()
