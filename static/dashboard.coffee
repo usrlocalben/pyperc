@@ -31,17 +31,16 @@ class ViewModel
 
             $.get '/api/events/', {limit: MAX_EVENTS}, (data, status) =>
                 @last_event = 0
-                $.each(data.events, (idx, item) =>
+                $.each data.events.reverse(), (idx, item) =>
                     @last_event = Math.max @last_event, item.id
-                    @events.unshift item
-                )
+                    @events.push item
                 delay 4000, @pollEvents
 
         @pollEvents = =>
             $.get('/api/events/', {since: @last_event}, (data, status) =>
                 $.each data.events, (idx, item) =>
                     @last_event = Math.max @last_event, item.id
-                    @events.unshift item 
+                    @events.unshift item
                     if @events().length > MAX_EVENTS
                         @events.pop
                 delay 4000, @pollEvents

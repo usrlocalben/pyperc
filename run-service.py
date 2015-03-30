@@ -5,6 +5,7 @@ import json
 import ujson
 import pprint
 import urlparse
+from itertools import takewhile
 
 import twisted.internet.reactor
 import twisted.web.server
@@ -17,7 +18,7 @@ PERC_POLL_PERIOD = 1
 def limited_to(limit, iterable):
     total = 0
     for item in iterable:
-        if total >= limit:
+        if total >= int(limit):
             return
         yield item
         total += 1
@@ -52,18 +53,12 @@ class percapi(twisted.web.resource.Resource):
             since = args.get('since', None)
             limit = args.get('limit', None)
 
-            if since:
-                print 'filtering by id'
-                events = takewhile(lambda item: item['id'] > since, pa.events)
-            else:
-                print 'results are unfiltered'
-                events = pa.events
+            events = (item for item in pa.events if item['code'] not in (30, 113, 236))
 
+            if since:
+                events = takewhile(lambda item: item['id'] > int(since), events)
             if limit:
-                print 'limiting to ', limit
                 events = limited_to(limit, events)
-            else:
-                print 'results are unlimited'
 
             return ujson.dumps({
                 'success': True,
