@@ -8,19 +8,11 @@ import time
 import pprint
 import subprocess
 from datetime import datetime, timedelta
-#from subprocess import CalledProcessError
-
-MEGACLI_EXE = '/usr/local/sbin/megacli'
-#MEGACLI = '/usr/sbin/megacli'
-#MEGACLI = '/home/byates/mega/bin/MegaCli64'
-
-DATAPATH = '/var/lib/pyperc'
 
 from events import MegaEvent
-#from megacli import MegaCLI, MEgaCLIRunner
 from sortedcollection import SortedCollection, NotUniqueError
 
-
+MEGACLI_EXE = '/usr/local/sbin/megacli'
 
 class PyPerc(object):
 

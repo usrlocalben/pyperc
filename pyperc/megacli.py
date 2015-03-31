@@ -56,7 +56,7 @@ class MegaCLI(object):
         lines.pop(0) # ''
         l,r = megasplit(lines.pop(0)) # 'Number of Virtual Disks: 2'
         if l != 'Number of Virtual Disks':
-            raise ValueError("expected 'Number of Virtual Disks'");
+            raise ValueError("expected 'Number of Virtual Disks'")
         total_volumes = int(r)
 
         # rejoin and resplit
@@ -401,7 +401,7 @@ class MegaCLI(object):
                 try:
                     l,r = re.match(r"^([\w\'\(\)\-\. ]+):\W*(.*)$",line).groups()
                 except:
-                    print "failed to match/split [%s]" % ( line )
+                    print "failed to match/split [%s]" % line
                     raise
                 #XXX special case for the drive data because we need to preserve exact chars
                 """
@@ -433,7 +433,7 @@ Inquiry Data: BTWL3134009C300PGN  INTEL SSDSC2BB300G4                     D20103
         blah = res.split(' ')
         pct = blah[10][:-1]
         minutes = int(blah[12])
-        return pct, min
+        return pct, minutes
 
 
     def get_PDList(self):

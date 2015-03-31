@@ -15,14 +15,3 @@ def from_megadate(val):
 def to_megadate(val):
     return val.strftime(MEGADATE_FORMAT)
 
-def rematch(pattern, data):
-    matches = re.match(pattern, data)
-    if matches:
-        yield matches
-
-def maybe_unlink(fname):
-#    try:
-    os.unlink(fname)
-#    except OSError:
-#        pass
-
