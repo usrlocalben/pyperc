@@ -1,5 +1,5 @@
 
-codetable = {
+MEGA_EVENT_CODES = {
     0: '0:Firmware initialization started',
     1: '0:Firmware version',
     4: '0:Configuration cleared',

@@ -1,1 +1,3 @@
-from pyperc import perc
+from pyperc import PyPerc
+from megacli import MegaCLI, MegaCLIRunner
+

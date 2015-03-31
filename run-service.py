@@ -11,9 +11,23 @@ import twisted.internet.reactor
 import twisted.web.server
 import twisted.web.resource
 
-import pyperc
+from pyperc import PyPerc, MegaCLI, MegaCLIRunner
+
 
 PERC_POLL_PERIOD = 1
+pa = PyPerc(
+        megacli=MegaCLI(
+            runner=MegaCLIRunner(exe="/usr/local/sbin/megacli", adapter=0)
+            )
+        )
+
+def percpoll(s):
+    pa.poll()
+    last_event = pa.last_event()
+    twisted.internet.reactor.callLater(PERC_POLL_PERIOD, percpoll, "again")
+
+twisted.internet.reactor.callLater(0, percpoll, "first")
+
 
 def limited_to(limit, iterable):
     total = 0
@@ -42,8 +56,8 @@ class percapi(twisted.web.resource.Resource):
         if request.path == '/info/':
             return ujson.dumps({
                 'success': True,
-                'ad': pa.adinfo,
-                'cf': pa.cfinfo,
+                'ad': pa.adapter_details,
+                'cf': pa.config_details,
                 'ld': pa.ldinfo,
                 'pd': pa.pdinfo,
                 'pd_to_ld': pa.pd_to_ld,
@@ -53,34 +67,29 @@ class percapi(twisted.web.resource.Resource):
             since = args.get('since', None)
             limit = args.get('limit', None)
 
-            events = (item for item in pa.events if item['code'] not in (30, 113, 236))
-
-            if since:
-                events = takewhile(lambda item: item['id'] > int(since), events)
-            if limit:
-                events = limited_to(limit, events)
-
-            return ujson.dumps({
-                'success': True,
-                'events': list(events),
-            })
+            if not since:
+                events = reversed(pa.events.data)
+                events = (item for item in events if item.code not in (30, 113, 236))
+                if limit is not None:
+                    events = limited_to(limit, events)
+                serialized = (item.to_dict() for item in events)
+                return ujson.dumps({
+                    'success': True,
+                    'events': list(serialized),
+                    })
+            else:
+                events = pa.events.find_gt(int(since), limit=limit, filter=lambda event: event.id not in (30, 113, 236))
+                serialized = (item.to_dict() for item in events)
+                return ujson.dumps({
+                    'success': True,
+                    'events': list(serialized),
+                })
 
         else:
             print 'bad request: ['+request.path+']'
             return ujson.dumps({'success':False,'message':'unknown request'})
 
 
-def percpoll(s):
-    pa.refresh()
-    twisted.internet.reactor.callLater(PERC_POLL_PERIOD,percpoll,"again")
-
-
-pa = pyperc.perc()
-
-
-twisted.internet.reactor.callLater(0,percpoll,"first")
-
 twisted.internet.reactor.listenTCP(50001, twisted.web.server.Site(percapi()))
-
 twisted.internet.reactor.run()
 
