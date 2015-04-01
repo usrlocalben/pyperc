@@ -1,0 +1,5 @@
+*.py[co]
+*.wsgic
+
+bower_components/
+venv/
