@@ -1,0 +1,12 @@
+                                     
+Adapter #0
+
+Newest Seqnum: 0x00004ef1
+Oldest Seqnum: 0x00000001
+Clear Seqnum: 0x00004ef1
+Shutdown Seqnum: 0x00004ba5
+Reboot Seqnum: 0x00004bf3
+
+Success in AdpEventLog
+
+Exit Code: 0x00
