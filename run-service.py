@@ -2,7 +2,6 @@
 
 import time
 import json
-import ujson
 import pprint
 import urlparse
 from itertools import takewhile
@@ -52,7 +51,7 @@ class PercApiInfo(Resource):
         self.request_count += 1
         request.setHeader("Content-type", "application/json")
 
-        return ujson.dumps({
+        return json.dumps({
             'success': True,
             'ad': pa.adapter_details,
             'cf': pa.config_details,
@@ -90,7 +89,7 @@ class PercApiEvents(Resource):
 
         events = (item for item in events if item['code'] not in ignore)
         events = sorted(events, key=lambda item: item['id'])
-        return ujson.dumps({
+        return json.dumps({
             'success': True,
             'events': events,
             })
