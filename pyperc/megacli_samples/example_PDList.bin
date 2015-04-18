@@ -1,0 +1,225 @@
+                                     
+Adapter #0
+
+Enclosure Device ID: N/A
+Slot Number: 0
+Drive's position: DiskGroup: 0, Span: 0, Arm: 0
+Enclosure position: N/A
+Device Id: 0
+WWN: 
+Sequence Number: 2
+Media Error Count: 0
+Other Error Count: 25
+Predictive Failure Count: 0
+Last Predictive Failure Event Seq Number: 0
+PD Type: SATA
+
+Raw Size: 1.819 TB [0xe8e088b0 Sectors]
+Non Coerced Size: 1.818 TB [0xe8d088b0 Sectors]
+Coerced Size: 1.818 TB [0xe8d00000 Sectors]
+Sector Size:  0
+Firmware state: Online, Spun Up
+Device Firmware Level: 0A80
+Shield Counter: 0
+Successful diagnostics completion on :  N/A
+SAS Address(0): 0x1221000000000000
+Connected Port Number: 0(path0) 
+Inquiry Data:      WD-WMC1T0379425WDC WD20EFRX-68AX9N0                    80.00A80
+FDE Capable: Not Capable
+FDE Enable: Disable
+Secured: Unsecured
+Locked: Unlocked
+Needs EKM Attention: No
+Foreign State: None 
+Device Speed: Unknown 
+Link Speed: Unknown 
+Media Type: Hard Disk Device
+Drive Temperature : N/A
+PI Eligibility:  No 
+Drive is formatted for PI information:  No
+PI: No PI
+Port-0 :
+Port status: Active
+Port's Linkspeed: Unknown 
+Drive has flagged a S.M.A.R.T alert : No
+
+
+
+Enclosure Device ID: N/A
+Slot Number: 1
+Drive's position: DiskGroup: 0, Span: 0, Arm: 1
+Enclosure position: N/A
+Device Id: 1
+WWN: 
+Sequence Number: 2
+Media Error Count: 0
+Other Error Count: 25
+Predictive Failure Count: 0
+Last Predictive Failure Event Seq Number: 0
+PD Type: SATA
+
+Raw Size: 1.819 TB [0xe8e088b0 Sectors]
+Non Coerced Size: 1.818 TB [0xe8d088b0 Sectors]
+Coerced Size: 1.818 TB [0xe8d00000 Sectors]
+Sector Size:  0
+Firmware state: Online, Spun Up
+Device Firmware Level: 0A80
+Shield Counter: 0
+Successful diagnostics completion on :  N/A
+SAS Address(0): 0x1221000001000000
+Connected Port Number: 1(path0) 
+Inquiry Data:      WD-WMC1T0380061WDC WD20EFRX-68AX9N0                    80.00A80
+FDE Capable: Not Capable
+FDE Enable: Disable
+Secured: Unsecured
+Locked: Unlocked
+Needs EKM Attention: No
+Foreign State: None 
+Device Speed: Unknown 
+Link Speed: Unknown 
+Media Type: Hard Disk Device
+Drive Temperature : N/A
+PI Eligibility:  No 
+Drive is formatted for PI information:  No
+PI: No PI
+Port-0 :
+Port status: Active
+Port's Linkspeed: Unknown 
+Drive has flagged a S.M.A.R.T alert : No
+
+
+
+Enclosure Device ID: N/A
+Slot Number: 2
+Drive's position: DiskGroup: 0, Span: 1, Arm: 0
+Enclosure position: N/A
+Device Id: 2
+WWN: 
+Sequence Number: 2
+Media Error Count: 0
+Other Error Count: 25
+Predictive Failure Count: 0
+Last Predictive Failure Event Seq Number: 0
+PD Type: SATA
+
+Raw Size: 1.819 TB [0xe8e088b0 Sectors]
+Non Coerced Size: 1.818 TB [0xe8d088b0 Sectors]
+Coerced Size: 1.818 TB [0xe8d00000 Sectors]
+Sector Size:  0
+Firmware state: Online, Spun Up
+Device Firmware Level: 0A80
+Shield Counter: 0
+Successful diagnostics completion on :  N/A
+SAS Address(0): 0x1221000002000000
+Connected Port Number: 2(path0) 
+Inquiry Data:      WD-WMC1T0378641WDC WD20EFRX-68AX9N0                    80.00A80
+FDE Capable: Not Capable
+FDE Enable: Disable
+Secured: Unsecured
+Locked: Unlocked
+Needs EKM Attention: No
+Foreign State: None 
+Device Speed: Unknown 
+Link Speed: Unknown 
+Media Type: Hard Disk Device
+Drive Temperature : N/A
+PI Eligibility:  No 
+Drive is formatted for PI information:  No
+PI: No PI
+Port-0 :
+Port status: Active
+Port's Linkspeed: Unknown 
+Drive has flagged a S.M.A.R.T alert : No
+
+
+
+Enclosure Device ID: N/A
+Slot Number: 3
+Drive's position: DiskGroup: 0, Span: 1, Arm: 1
+Enclosure position: N/A
+Device Id: 3
+WWN: 
+Sequence Number: 5
+Media Error Count: 0
+Other Error Count: 25
+Predictive Failure Count: 0
+Last Predictive Failure Event Seq Number: 0
+PD Type: SATA
+
+Raw Size: 1.819 TB [0xe8e088b0 Sectors]
+Non Coerced Size: 1.818 TB [0xe8d088b0 Sectors]
+Coerced Size: 1.818 TB [0xe8d00000 Sectors]
+Sector Size:  0
+Firmware state: Online, Spun Up
+Device Firmware Level: 0A80
+Shield Counter: 0
+Successful diagnostics completion on :  N/A
+SAS Address(0): 0x1221000003000000
+Connected Port Number: 3(path0) 
+Inquiry Data:      WD-WMC300414650WDC WD20EFRX-68AX9N0                    80.00A80
+FDE Capable: Not Capable
+FDE Enable: Disable
+Secured: Unsecured
+Locked: Unlocked
+Needs EKM Attention: No
+Foreign State: None 
+Device Speed: Unknown 
+Link Speed: Unknown 
+Media Type: Hard Disk Device
+Drive Temperature : N/A
+PI Eligibility:  No 
+Drive is formatted for PI information:  No
+PI: No PI
+Port-0 :
+Port status: Active
+Port's Linkspeed: Unknown 
+Drive has flagged a S.M.A.R.T alert : No
+
+
+
+Enclosure Device ID: N/A
+Slot Number: 4
+Enclosure position: N/A
+Device Id: 4
+WWN: 
+Sequence Number: 3
+Media Error Count: 0
+Other Error Count: 13
+Predictive Failure Count: 0
+Last Predictive Failure Event Seq Number: 0
+PD Type: SATA
+Hotspare Information: 
+Type: Global, is revertible
+
+Raw Size: 1.819 TB [0xe8e088b0 Sectors]
+Non Coerced Size: 1.818 TB [0xe8d088b0 Sectors]
+Coerced Size: 1.818 TB [0xe8d00000 Sectors]
+Sector Size:  0
+Firmware state: Hotspare, Spun Up
+Device Firmware Level: 0A80
+Shield Counter: 0
+Successful diagnostics completion on :  N/A
+SAS Address(0): 0x1221000004000000
+Connected Port Number: 4(path0) 
+Inquiry Data:      WD-WMC1T0421813WDC WD20EFRX-68AX9N0                    80.00A80
+FDE Capable: Not Capable
+FDE Enable: Disable
+Secured: Unsecured
+Locked: Unlocked
+Needs EKM Attention: No
+Foreign State: None 
+Device Speed: Unknown 
+Link Speed: Unknown 
+Media Type: Hard Disk Device
+Drive Temperature : N/A
+PI Eligibility:  No 
+Drive is formatted for PI information:  No
+PI: No PI
+Port-0 :
+Port status: Active
+Port's Linkspeed: Unknown 
+Drive has flagged a S.M.A.R.T alert : No
+
+
+
+
