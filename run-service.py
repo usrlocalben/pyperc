@@ -73,15 +73,8 @@ class PercApiEvents(Resource):
         self.request_count += 1
         request.setHeader("Content-type", "application/json")
 
-        try:
-            since = request.args['since'][0]
-        except:
-            since = None
-
-        try:
-            limit = request.args['limit'][0]
-        except:
-            limit = None
+        since = request.args.get('since', [None])[0]
+        limit = request.args.get('limit', [None])[0]
 
         ignore = (30, 113, 236)
 
