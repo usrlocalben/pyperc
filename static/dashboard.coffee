@@ -1,57 +1,70 @@
+requirejs.config {
+  baseUrl: 'static',
+  paths: {
+    moment: 'moment/min/moment.min',
+    jquery: 'jquery/dist/jquery.min',
+    knockout: 'knockout/dist/knockout',
+    bootstrap: 'bootstrap/dist/js/bootstrap.min'
+  }
+}
 
-MAX_EVENTS = 50
-EVENT_POLLING_PERIOD = 4000
+require ['jquery', 'bootstrap', 'knockout', 'moment'], (jquery, bootstrap, ko, moment) ->
 
-delay = (ms, func) -> setTimeout func, ms
+  MAX_EVENTS = 50
+  EVENT_POLLING_PERIOD = 4000
 
-numberWithCommas = (x) -> x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+  delay = (ms, func) -> setTimeout func, ms
 
-sectorsToMB = (x) -> Math.floor x * 512 / (1000 * 1000)
 
-class ViewModel
-  constructor: () ->
-    @last_event = 0
-    @events = ko.observableArray()
-    @adapter = ko.observable()
-    @volumes = ko.observableArray()
-    @devices = ko.observableArray()
 
-    @loadData = =>
-      $.get '/api/adapter/', {}, (data, status) =>
-        @adapter(data.ad)
-        ko.utils.arrayPushAll @volumes, data.ld
-        @devices.removeAll()
-        $.each(data.pd, (idx, item) =>
-          if item.device of data.pd_to_ld
-            item.member = true
-            item.volume = data.pd_to_ld[item.device].ld
-          else
-            item.member = false
-          @devices.push item
+  class ViewModel
+    constructor: () ->
+      @last_event = 0
+      @events = ko.observableArray()
+      @adapter = ko.observable()
+      @volumes = ko.observableArray()
+      @devices = ko.observableArray()
+
+      @loadData = =>
+        $.get '/api/adapter/', {}, (data, status) =>
+          @adapter(data.ad)
+          ko.utils.arrayPushAll @volumes, data.ld
+          @devices.removeAll()
+          $.each(data.pd, (idx, item) =>
+            if item.device of data.pd_to_ld
+              item.member = true
+              item.volume = data.pd_to_ld[item.device].ld
+            else
+              item.member = false
+            @devices.push item
+          )
+
+        $.get '/api/events/', {limit: MAX_EVENTS}, (data, status) =>
+          @last_event = 0
+          $.each data.events.reverse(), (idx, item) =>
+            @last_event = Math.max @last_event, item.id
+            @events.push item
+          delay EVENT_POLLING_PERIOD, @pollEvents
+
+      @pollEvents = =>
+        $.get('/api/events/', {since: @last_event}, (data, status) =>
+          $.each(data.events, (idx, item) =>
+            @last_event = Math.max @last_event, item.id
+            @events.unshift item
+            if @events().length > MAX_EVENTS
+              @events.pop
+          )
+        ).always(=>
+          delay EVENT_POLLING_PERIOD, @pollEvents
         )
 
-      $.get '/api/events/', {limit: MAX_EVENTS}, (data, status) =>
-        @last_event = 0
-        $.each data.events.reverse(), (idx, item) =>
-          @last_event = Math.max @last_event, item.id
-          @events.push item
-        delay EVENT_POLLING_PERIOD, @pollEvents
+      @numberWithCommas = (x) -> x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
 
-    @pollEvents = =>
-      $.get('/api/events/', {since: @last_event}, (data, status) =>
-        $.each(data.events, (idx, item) =>
-          @last_event = Math.max @last_event, item.id
-          @events.unshift item
-          if @events().length > MAX_EVENTS
-            @events.pop
-        )
-      ).always(=>
-        delay EVENT_POLLING_PERIOD, @pollEvents
-      )
+      @sectorsToMB = (x) -> Math.floor x * 512 / (1000 * 1000)
 
-vm = new ViewModel()
-ko.applyBindings vm
+  vm = new ViewModel()
+  ko.applyBindings vm
 
-$ ->
-  vm.loadData()
+  $ ->
+    vm.loadData()
 
