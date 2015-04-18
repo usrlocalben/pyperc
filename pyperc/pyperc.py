@@ -25,11 +25,11 @@ class PyPerc(object):
 
     def load(self):
         self.adapter_details, self.config_details = self.megacli.get_AdpAllInfo()
-        self.ldmap, self.pd_to_ld = self.megacli.get_ldpd_info()
+        self.ld_to_target, self.pd_to_ld = self.megacli.get_ldpd_info()
 
         self.ldinfo = []
-        for target in self.ldmap:
-            self.ldinfo.append(self.megacli.get_LDInfo(target))
+        for ld in self.ld_to_target:
+            self.ldinfo.append(self.megacli.get_LDInfo(ld))
 
         self.pdinfo, _ = self.megacli.get_PDList()
         self.loaded = True

@@ -49,89 +49,99 @@ class MegaCLI(object):
 
     def get_ldpd_info(self):
 
-        lines = self.megarun(['-LdPdInfo'])
+        def parse_ldpdinfo():
+            lines = self.megarun(['-LdPdInfo'])
 
-        current_vd = None
-        current_pd = None
-        current_span = None
-        current_pd_slot_id = None
-        current_pd_device_id = None
+            current_vd = None
+            current_target_id = None
+            current_pd = None
+            current_span = None
+            current_pd_slot_id = None
+            current_pd_device_id = None
 
+            pd_to_ld = {}
+
+            ldmap = {}
+
+            for line in lines:
+
+                if line.startswith('Number of Virtual Disks:'):
+                    left, right = megasplit(line)
+                    number_of_virtual_disks = int(right)
+
+                elif line.startswith('Virtual Drive:'): # 'Virtual Drive: 0 (Target Id: 0)'
+                    left, right = megasplit(line)
+                    vd_str, target_str = re.match(r"([0-9]+)\W+\(Target Id:\W+([0-9]+)\)", right).groups()
+                    vd_id = int(vd_str)
+                    target_id = int(target_str)
+
+                    ldmap[vd_id] = target_id
+                    if current_vd is not None:
+                        yield current_target_id, current_vd, current_span, current_pd, current_pd_device_id
+                        current_pd = None
+                        current_span = None
+                    current_vd = vd_id
+                    current_target_id = target_id
+
+                elif line.startswith('Number Of Drives per span:'): # 'Number Of Drives per span:2'
+                    left, right = megasplit(line)
+                    drives_per_span = int(right)
+
+                elif line.startswith('Span Depth:'):
+                    left, right = megasplit(line)
+                    span_depth = int(right)
+
+                elif line.startswith('Number of Spans'):
+                    left, right = megasplit(line)
+                    number_of_spans = int(right)
+
+                elif line.startswith('Span:'): # 'Span: 0 - Number of PDs: 2'
+                    left, right = megasplit(line)
+                    span_id = int(right.split(' ')[0])
+
+                    if current_span is not None:
+                        yield current_target_id, current_vd, current_span, current_pd, current_pd_device_id
+                        current_pd = None
+
+                    current_span = span_id
+
+                elif line.startswith('PD:'): # 'PD: 0 Information'
+                    left, right = megasplit(line)
+                    pd_id = int(right.split(' ')[0])
+                    if current_pd is not None:
+                        yield current_target_id, current_vd, current_span, current_pd, current_pd_device_id
+                    current_pd = pd_id
+
+                elif line.startswith('Slot Number:'):
+                    left, right = megasplit(line)
+                    slot_id = int(right)
+                    current_pd_slot_id = slot_id
+
+                elif line.startswith('Device Id:'):
+                    left, right = megasplit(line)
+                    device_id = int(right)
+                    current_pd_device_id = device_id
+
+            # endfor lines
+            if current_pd is not None:
+                yield current_target_id, current_vd, current_span, current_pd, current_pd_device_id
+
+            if len(ldmap) != number_of_virtual_disks:
+                raise Exception("get_ldpd_map chunks did not match the indicated volume count")
+
+        #enddef get_ldpdinfo
+
+        ld_to_target = {}
         pd_to_ld = {}
-        def emit(vd, span, pd, device_id):
-            print 'emit', vd, span, pd, device_id
+        for target_id, vd, span, pd, device_id in parse_ldpdinfo():
+            ld_to_target[vd] = target_id
             if device_id in pd_to_ld:
                 raise Exception("physical-device is used by multiple volumes?")
             pd_to_ld[device_id] = {'ld': vd, 'span': span, 'unit': pd}
 
-        ldmap = {}
-
-        for line in lines:
-
-            if line.startswith('Number of Virtual Disks:'):
-                left, right = megasplit(line)
-                number_of_virtual_disks = int(right)
-
-            elif line.startswith('Virtual Drive:'): # 'Virtual Drive: 0 (Target Id: 0)'
-                left, right = megasplit(line)
-                vd_str, target_str = re.match(r"([0-9]+)\W+\(Target Id:\W+([0-9]+)\)", right).groups()
-                vd_id = int(vd_str)
-                target_id = int(target_str)
-
-                ldmap[vd_id] = target_id
-                if current_vd is not None:
-                    emit(current_vd, current_span, current_pd, current_pd_device_id)
-                    current_pd = None
-                    current_span = None
-                current_vd = vd_id
-
-            elif line.startswith('Number Of Drives per span:'): # 'Number Of Drives per span:2'
-                left, right = megasplit(line)
-                drives_per_span = int(right)
-
-            elif line.startswith('Span Depth:'):
-                left, right = megasplit(line)
-                span_depth = int(right)
-
-            elif line.startswith('Number of Spans'):
-                left, right = megasplit(line)
-                number_of_spans = int(right)
-
-            elif line.startswith('Span:'): # 'Span: 0 - Number of PDs: 2'
-                left, right = megasplit(line)
-                span_id = int(right.split(' ')[0])
-
-                if current_span is not None:
-                    emit(current_vd, current_span, current_pd, current_pd_device_id)
-                    current_pd = None
-
-                current_span = span_id
-
-            elif line.startswith('PD:'): # 'PD: 0 Information'
-                left, right = megasplit(line)
-                pd_id = int(right.split(' ')[0])
-                if current_pd is not None:
-                    emit(current_vd, current_span, current_pd, current_pd_device_id)
-                current_pd = pd_id
-
-            elif line.startswith('Slot Number:'):
-                left, right = megasplit(line)
-                slot_id = int(right)
-                current_pd_slot_id = slot_id
-
-            elif line.startswith('Device Id:'):
-                left, right = megasplit(line)
-                device_id = int(right)
-                current_pd_device_id = device_id
-
-        # endfor lines
-        if current_pd is not None:
-            emit(current_vd, current_span, current_pd, current_pd_device_id)
-
-        if len(ldmap) != number_of_virtual_disks:
-            raise Exception("get_ldpd_map chunks did not match the indicated volume count")
-
-        return ldmap, pd_to_ld
+        #print ld_to_target
+        #print pd_to_ld
+        return ld_to_target, pd_to_ld
 
     #enddef get_ldpd_info
 
