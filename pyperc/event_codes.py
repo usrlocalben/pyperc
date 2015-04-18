@@ -107,6 +107,9 @@ MEGA_EVENT_CODES = {
     267: '1:Command timeout on PD', # 'Command timeout on PD 00(e0xff/s0) Path 1221000000000000, CDB: 28 00 18 fa ad 00 00 00 80 00'
     268: '1:PD Reset', # 'PD 00(e0xff/s0) Path 1221000000000000 reset (Type 03)'
 
+    278: '0:CopyBack complete on PD', # 'CopyBack complete on PD 03(e0xff/s3) from PD 04(e0xff/s4)'
+    280: '0:CopyBack resumed on PD', # 'CopyBack resumed on PD 03(e0xff/s3) from PD 04(e0xff/s4)'
+    281: '0:CopyBack automatically started on PD', # 'CopyBack automatically started on PD 03(e0xff/s3) from PD 04(e0xff/s4)'
     286: '0:Controller hardware revision ID (0x0)', # ????
     303: '2:Controller properties changed',
 }
