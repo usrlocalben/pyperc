@@ -116,8 +116,20 @@
 <tbody data-bind="foreach: events">
 <tr>
     <td class="text-center" data-bind="text: id"></td>
-    <td class="text-center" data-bind="text: moment(time).format('MMM Do YYYY')"></td>
-    <td class="text-center" data-bind="text: moment(time).format('HH:mm:ss')"></td>
+    <td class="text-center">
+        <span data-bind="if: 'time' in $data">
+            <span data-bind="text: moment(time).format('MMM Do YYYY')"></span>
+        </span>
+        <span data-bind="if: !('time' in $data)">rtc not set</span>
+    </td>
+    <td class="text-center">
+        <span data-bind="if: 'time' in $data">
+            <span data-bind="text: moment(time).format('HH:mm:ss')"></span>
+        </span>
+        <span data-bind="if: !('time' in $data)">
+            +<span data-bind="text: sslr"></span>s
+        </span>
+    </td>
     <td class="text-center" data-bind="text: code"></td>
     <td class="text-left" data-bind="text: description, css:{'text-primary':level==1,'text-warning':level==2,'text-danger':level==3}"></td>
 </tr>
