@@ -57,6 +57,7 @@ PD_STATE_TEXT = {
     'Online, Spun Up': 'online',
     'Unconfigured(bad)': 'unconfigured-bad',
     'Unconfigured(good), Spun Up': 'unconfigured-good',
+    'Hotspare, Spun Up': 'hotspare',
 }
 def decode_pd_state(val):
     try:
