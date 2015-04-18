@@ -189,12 +189,13 @@ class MegaCLI(object):
             raise ValueError("i expected 4 chunks in the PCI info block, but instead there were %d" % (len(chunks)))
 
         m = {
-             'Vendor Id'     : 'pci_vendor'
-            ,'Device Id'     : 'pci_device'
-            ,'SubVendorId'   : 'pci_subvendor'
-            ,'SubDeviceId'   : 'pci_subdevice'
-            ,'Controller Id' : 'controller_id' # '0000'
+            'Vendor Id': 'pci_vendor',
+            'Device Id': 'pci_device',
+            'SubVendorId': 'pci_subvendor',
+            'SubDeviceId': 'pci_subdevice',
+            'Controller Id': 'controller_id', # '0000'
         }
+
         for l,r in ( megasplit(s) for s in chunks[0].split("\n") if s != '' ):
             if l not in m: raise NameError("unhandled adapter attribute pci info '%s'='%s'" % (l,r))
             adapter_details[ m[l] ] = r
@@ -215,19 +216,19 @@ class MegaCLI(object):
 
 
         m = {
-              'SAS Address'                       : ( 'sas_address'           ,decode_noop )
-             ,'BBU'                               : ( 'has_bbu'               ,decode_present )
-             ,'Alarm'                             : ( 'has_alarm'             ,decode_present )
-             ,'NVRAM'                             : ( 'has_nvram'             ,decode_present )
-             ,'Serial Debugger'                   : ( 'has_debugger'          ,decode_present )
-             ,'Memory'                            : ( 'has_memory'            ,decode_present )
-             ,'Flash'                             : ( 'has_flash'             ,decode_present )
-             ,'Memory Size'                       : ( 'memory_size'           ,hmem_to_int )
-             ,'TPM'                               : ( 'has_tpm'               ,decode_present )
-             ,'On board Expander'                 : ( 'has_expander'          ,decode_present )
-             ,'Upgrade Key'                       : ( 'upgrade_key'           ,decode_noop )
-             ,'Temperature sensor for ROC'        : ( 'has_sensor_roc'        ,decode_present )
-             ,'Temperature sensor for controller' : ( 'has_sensor_controller' ,decode_present )
+             'SAS Address'                       : ('sas_address'           ,decode_noop),
+             'BBU'                               : ('has_bbu'               ,decode_present),
+             'Alarm'                             : ('has_alarm'             ,decode_present),
+             'NVRAM'                             : ('has_nvram'             ,decode_present),
+             'Serial Debugger'                   : ('has_debugger'          ,decode_present),
+             'Memory'                            : ('has_memory'            ,decode_present),
+             'Flash'                             : ('has_flash'             ,decode_present),
+             'Memory Size'                       : ('memory_size'           ,hmem_to_int),
+             'TPM'                               : ('has_tpm'               ,decode_present),
+             'On board Expander'                 : ('has_expander'          ,decode_present),
+             'Upgrade Key'                       : ('upgrade_key'           ,decode_noop),
+             'Temperature sensor for ROC'        : ('has_sensor_roc'        ,decode_present),
+             'Temperature sensor for controller' : ('has_sensor_controller' ,decode_present),
         }
         for l,r in ( megasplit(s) for s in sections['HW Configuration'] if s != '' ):
             if l not in m: raise NameError("unhandled adapter attribute hw config '%s'='%s'" % (l,r))
@@ -239,46 +240,46 @@ class MegaCLI(object):
 
 
         m = {
-             'Current Time'                    : ( 'time', decode_strtotime )
-            ,'Predictive Fail Poll Interval'   : ( 'pf_poll_seconds', decode_intsec ) # '300sec' -> 300
-            ,'Interrupt Throttle Active Count' : None
-            ,'Interrupt Throttle Completion'   : None
-            ,'Rebuild Rate'                    : ( 'rate_rebuild', decode_intpct )
-            ,'PR Rate'                         : ( 'rate_pr', decode_intpct )
-            ,'BGI Rate'                        : ( 'rate_bgi', decode_intpct )
-            ,'Check Consistency Rate'          : ( 'rate_cc', decode_intpct )
-            ,'Reconstruction Rate'             : ( 'rate_recon', decode_intpct )
-            ,'Cache Flush Interval'            : ( 'cache_flush_seconds', decode_intsec ) # '4s' assumes NNNNs
-            ,'Max Drives to Spinup at One Time': None
-            ,'Delay Among Spinup Groups'       : None
-            ,'Physical Drive Coercion Mode'    : ( 'rounding_size', hmem_to_int ) # '128MB' -> 128
-            ,'Cluster Mode'                    : None
-            ,'Alarm'                           : ( 'alarm_state', decode_noop ) # 'Disabled' -- does enabled mean the alarm is emitting sound?
-            ,'Auto Rebuild'                    : ( 'auto_rebuild', decode_noop ) # 'Enabled'
-            ,'Battery Warning'                 : ( 'battery_warning', decode_noop ) # 'Enabled'
-            ,'Ecc Bucket Size'                 : ( 'ecc_bucket_size', decode_int ) # ???
-            ,'Ecc Bucket Leak Rate'            : ( 'ecc_bucket_leak_minutes', decode_minutes ) # '1440 minutes'
-            ,'Restore HotSpare on Insertion'   : None
-            ,'Expose Enclosure Devices'        : None
-            ,'Maintain PD Fail History'        : None
-            ,'Host Request Reordering'         : None # is this related to TCQ?
-            ,'Auto Detect BackPlane Enabled'   : None
-            ,'Load Balance Mode'               : None
-            ,'Use FDE Only'                    : None
-            ,'Security Key Assigned'           : None
-            ,'Security Key Failed'             : None
-            ,'Security Key Not Backedup'       : None
-            ,'Any Offline VD Cache Preserved'  : None
-            ,'Allow Boot with Preserved Cache' : None
-            ,'Disable Online Controller Reset' : None
-            ,'PFK in NVRAM'                    : None # what is PFK???
-            ,'Use disk activity for locate'    : None
-            ,'Default LD PowerSave Policy'     : None # 'Controller Defined'
-            ,'Maximum number of direct attached drives to spin up in 1 min' : None # '0'
-            ,'Auto Enhanced Import'            : None # 'No'
-            ,'POST delay'                      : None # '90 seconds'
-            ,'BIOS Error Handling'             : None # 'Stop On Errors'
-            ,'Current Boot Mode'               : None # 'Normal'
+            'Current Time'                    : ('time', decode_strtotime),
+            'Predictive Fail Poll Interval'   : ('pf_poll_seconds', decode_intsec), # '300sec' -> 300
+            'Interrupt Throttle Active Count' : None,
+            'Interrupt Throttle Completion'   : None,
+            'Rebuild Rate'                    : ('rate_rebuild', decode_intpct),
+            'PR Rate'                         : ('rate_pr', decode_intpct),
+            'BGI Rate'                        : ('rate_bgi', decode_intpct),
+            'Check Consistency Rate'          : ('rate_cc', decode_intpct),
+            'Reconstruction Rate'             : ('rate_recon', decode_intpct),
+            'Cache Flush Interval'            : ('cache_flush_seconds', decode_intsec), # '4s' assumes NNNNs
+            'Max Drives to Spinup at One Time': None,
+            'Delay Among Spinup Groups'       : None,
+            'Physical Drive Coercion Mode'    : ('rounding_size', hmem_to_int), # '128MB' -> 128
+            'Cluster Mode'                    : None,
+            'Alarm'                           : ('alarm_state', decode_noop), # 'Disabled' -- does enabled mean the alarm is emitting sound?
+            'Auto Rebuild'                    : ('auto_rebuild', decode_noop), # 'Enabled'
+            'Battery Warning'                 : ('battery_warning', decode_noop), # 'Enabled'
+            'Ecc Bucket Size'                 : ('ecc_bucket_size', decode_int), # ???
+            'Ecc Bucket Leak Rate'            : ('ecc_bucket_leak_minutes', decode_minutes), # '1440 minutes'
+            'Restore HotSpare on Insertion'   : None,
+            'Expose Enclosure Devices'        : None,
+            'Maintain PD Fail History'        : None,
+            'Host Request Reordering'         : None, # is this related to TCQ?
+            'Auto Detect BackPlane Enabled'   : None,
+            'Load Balance Mode'               : None,
+            'Use FDE Only'                    : None,
+            'Security Key Assigned'           : None,
+            'Security Key Failed'             : None,
+            'Security Key Not Backedup'       : None,
+            'Any Offline VD Cache Preserved'  : None,
+            'Allow Boot with Preserved Cache' : None,
+            'Disable Online Controller Reset' : None,
+            'PFK in NVRAM'                    : None, # what is PFK???
+            'Use disk activity for locate'    : None,
+            'Default LD PowerSave Policy'     : None, # 'Controller Defined'
+            'Maximum number of direct attached drives to spin up in 1 min' : None, # '0'
+            'Auto Enhanced Import'            : None, # 'No'
+            'POST delay'                      : None, # '90 seconds'
+            'BIOS Error Handling'             : None, # 'Stop On Errors'
+            'Current Boot Mode'               : None, # 'Normal'
         }
         for l,r in ( megasplit(s) for s in sections['Settings'] if s != '' ):
             if l not in m: raise NameError("unhandled adapter settings attribute '%s'='%s'" % (l,r))
@@ -449,30 +450,30 @@ Inquiry Data: BTWL3134009C300PGN  INTEL SSDSC2BB300G4                     D20103
             #ser,mod,ver = re.split("\s+",pd['Inquiry Data'])
 
             a = {
-                 'enclosure'       : '' if pd['Enclosure Device ID'] == 'N/A' else pd['Enclosure Device ID']
-                ,'slot'            : int(pd['Slot Number'])
-                ,'device'          : int(pd['Device Id'])
-                ,'sequence'        : int(pd['Sequence Number'])
-                ,'errors_media'    : int(pd['Media Error Count'])
-                ,'errors_other'    : int(pd['Other Error Count'])
-#                ,'predicitive_failure_count'] = int(pd['Predictive Failure Count'])
-                ,'type'            : pd['PD Type']
-                ,'size_raw'        : decode_size(pd['Raw Size'])
-                ,'size_noncoerced' : decode_size(pd['Non Coerced Size'])
-                ,'size_coerced'    : decode_size(pd['Coerced Size'])
-                ,'state'           : decode_pd_state(pd['Firmware state'])
-                ,'connected_port_number' : pd['Connected Port Number']
-                ,'inq_serial'      : ser
-                ,'inq_model'       : mod
-                ,'inq_version'     : ver
-                ,'locked'          : pd['Locked']
-                ,'foreign_state'   : pd['Foreign State']
-                ,'device_speed'    : pd['Device Speed']
-                ,'link_speed'      : pd['Link Speed']
-                ,'media_type'      : pd['Media Type']
-                ,'enclosure_position' : pd['Enclosure position']
-                ,'firmware_level'  : pd['Device Firmware Level']
-                ,'shield_counter'  : pd['Shield Counter']
+                'enclosure'       : '' if pd['Enclosure Device ID'] == 'N/A' else pd['Enclosure Device ID'],
+                'slot'            : int(pd['Slot Number']),
+                'device'          : int(pd['Device Id']),
+                'sequence'        : int(pd['Sequence Number']),
+                'errors_media'    : int(pd['Media Error Count']),
+                'errors_other'    : int(pd['Other Error Count']),
+                #'predicitive_failure_count': int(pd['Predictive Failure Count']),
+                'type'            : pd['PD Type'],
+                'size_raw'        : decode_size(pd['Raw Size']),
+                'size_noncoerced' : decode_size(pd['Non Coerced Size']),
+                'size_coerced'    : decode_size(pd['Coerced Size']),
+                'state'           : decode_pd_state(pd['Firmware state']),
+                'connected_port_number' : pd['Connected Port Number'],
+                'inq_serial'      : ser,
+                'inq_model'       : mod,
+                'inq_version'     : ver,
+                'locked'          : pd['Locked'],
+                'foreign_state'   : pd['Foreign State'],
+                'device_speed'    : pd['Device Speed'],
+                'link_speed'      : pd['Link Speed'],
+                'media_type'      : pd['Media Type'],
+                'enclosure_position' : pd['Enclosure position'],
+                'firmware_level'  : pd['Device Firmware Level'],
+                'shield_counter'  : pd['Shield Counter'],
             }
             if 'Foreign Secure' in pd: a['foreign_secure'] = pd['Foreign Secure']
 
