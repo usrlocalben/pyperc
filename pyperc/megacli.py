@@ -384,42 +384,6 @@ class MegaCLI(object):
 
         return markers['newest'], markers['clear']
 
-    def get_PDList_raw(self):
-
-        lines = self.megarun(['-PDList'])
-        pdlist = []
-
-        a = {}
-        for line in lines:
-            if ':' not in line: continue
-
-            left, right = megasplit(line)
-
-            if left == 'Enclosure Device ID':
-                if a:
-                    pdlist.append(a)
-                    a = {}
-
-                #XXX special case for the drive data because we need to preserve exact chars
-                """
-Inquiry Data:             Z1M1971LST500NM0011                             SN03
-Inquiry Data:      WD-WMC1T0421813WDC WD20EFRX-68AX9N0                    80.00A80
-Inquiry Data: BTWL3134009C300PGN  INTEL SSDSC2BB300G4                     D2010350
-0123456789012345
-          111111
-              01234567890123456789012345678901234567890123456789012345678901234567890
-                        1111111111222222222233333333334444444444555555555566666666667
-                """
-            if line.startswith('Inquiry Data'):
-                a['Inquiry Data'] = line[14:]
-            else:
-                a[left] = right
-
-        #endfor lines
-        if a:
-            pdlist.append(a)
-
-        return pdlist
 
 
     def get_rebuild_progress(self, slot):
@@ -436,14 +400,43 @@ Inquiry Data: BTWL3134009C300PGN  INTEL SSDSC2BB300G4                     D20103
         return pct, minutes
 
 
+# special case for the drive data because we need to preserve exact chars
+# Inquiry Data:             Z1M1971LST500NM0011                             SN03
+# Inquiry Data:      WD-WMC1T0421813WDC WD20EFRX-68AX9N0                    80.00A80
+# Inquiry Data: BTWL3134009C300PGN  INTEL SSDSC2BB300G4                     D2010350
+# 0123456789012345
+#           111111
+#               01234567890123456789012345678901234567890123456789012345678901234567890
+#                         1111111111222222222233333333334444444444555555555566666666667
     def get_PDList(self):
+
+        def get_PDList_raw():
+            lines = self.megarun(['-PDList'])
+
+            a = {}
+            for line in lines:
+                if ':' not in line: continue
+                left, right = megasplit(line)
+
+                # each PD block starts with this entry
+                if left == 'Enclosure Device ID' and a:
+                    yield a
+                    a = {}
+
+                if line.startswith('Inquiry Data'):
+                    a['Inquiry Data'] = line[14:] # see example above
+                else:
+                    a[left] = right
+
+            #endfor lines
+            if a:
+                yield a
 
         pdidx = {}
         pdinfo = []
-        for pd in self.get_PDList_raw():
+        for pd in get_PDList_raw():
 
             #'WD-WMC1T0421813WDC WD20EFRX-68AX9N0                    80.00A80'
-            # also see details in get_raw_pdlist
             ser = pd['Inquiry Data'][0:20].strip()
             mod = pd['Inquiry Data'][20:60].strip()
             ver = pd['Inquiry Data'][60:].strip()
