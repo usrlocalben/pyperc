@@ -22,7 +22,7 @@ class ViewModel
         ko.utils.arrayPushAll @volumes, data.ld
         @devices.removeAll()
         $.each(data.pd, (idx, item) =>
-          if item.device in data.pd_to_ld
+          if item.device of data.pd_to_ld
             item.member = true
             item.volume = data.pd_to_ld[item.device].ld
           else
