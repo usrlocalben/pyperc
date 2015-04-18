@@ -277,6 +277,8 @@ class MegaCLI(object):
             ,'Maximum number of direct attached drives to spin up in 1 min' : None # '0'
             ,'Auto Enhanced Import'            : None # 'No'
             ,'POST delay'                      : None # '90 seconds'
+            ,'BIOS Error Handling'             : None # 'Stop On Errors'
+            ,'Current Boot Mode'               : None # 'Normal'
         }
         for l,r in ( megasplit(s) for s in sections['Settings'] if s != '' ):
             if l not in m: raise NameError("unhandled adapter settings attribute '%s'='%s'" % (l,r))
@@ -350,6 +352,7 @@ class MegaCLI(object):
             elif l == 'Default Access Policy':     pass # 'Read/Write'
             elif l == 'Current Access Policy':     pass # 'Read/Write'
             elif l == 'Is VD Cached':              pass # 'No'
+            elif l == 'Sector Size':               a['sector_size'] = decode_int(r) #'512'
             else:
                 raise ValueError("unknown LD attribute '%s'='%s'"%(l,r))
         #endfor lines
@@ -470,7 +473,6 @@ Inquiry Data: BTWL3134009C300PGN  INTEL SSDSC2BB300G4                     D20103
                 ,'enclosure_position' : pd['Enclosure position']
                 ,'firmware_level'  : pd['Device Firmware Level']
                 ,'shield_counter'  : pd['Shield Counter']
-                ,'write_cache'     : pd['Drive\'s write cache']=='Enabled'
             }
             if 'Foreign Secure' in pd: a['foreign_secure'] = pd['Foreign Secure']
 
