@@ -2,7 +2,6 @@
 
 import time
 import json
-import pprint
 import urlparse
 from itertools import takewhile
 
@@ -18,7 +17,7 @@ from pyperc import PyPerc, MegaCLI, MegaCLIRunner
 PERC_POLL_PERIOD = 1
 pa = PyPerc(
         megacli=MegaCLI(
-            runner=MegaCLIRunner(exe="/usr/local/sbin/megacli", adapter=0)
+            runner=MegaCLIRunner(exe="/opt/MegaRAID/MegaCli/MegaCli64", adapter=0)
             )
         )
 
@@ -45,8 +44,8 @@ class PercApiInfo(Resource):
 
     def render_GET(self, request):
 
-        remote_host = request.getHost() #( twisted.internet.address.IPv4Address .host, .port, .type )
-        print "adapter %s %s" % (remote_host.host, request.uri)
+        #remote_host = request.getHost() #( twisted.internet.address.IPv4Address .host, .port, .type )
+        #print "adapter %s %s" % (remote_host.host, request.uri)
 
         self.request_count += 1
         request.setHeader("Content-type", "application/json")
@@ -66,8 +65,8 @@ class PercApiEvents(Resource):
     request_count = 0
 
     def render_GET(self, request):
-        remote_host = request.getHost() #( twisted.internet.address.IPv4Address .host, .port, .type )
-        print "events - %s %s" % (remote_host.host, request.uri)
+        #remote_host = request.getHost() #( twisted.internet.address.IPv4Address .host, .port, .type )
+        #print "events - %s %s" % (remote_host.host, request.uri)
 
         self.request_count += 1
         request.setHeader("Content-type", "application/json")

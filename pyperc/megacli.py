@@ -19,7 +19,7 @@ class MegaCLIRunner(object):
 
         #print "exec:", " ".join(params)
         output = subprocess.check_output(
-            self.command + params + self.adapter
+            self.command + params + self.adapter + ['-NoLog']
         )
         return output
         #open('blob.bin','wb').write(megaout)

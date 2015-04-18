@@ -19,14 +19,9 @@ http://wiki.hetzner.de/index.php/LSI_RAID_Controller/en
 
 ### sudoers bits
 ```
-Cmnd_Alias MEGACLI = /usr/local/sbin/megacli
+Cmnd_Alias MEGACLI = /opt/MegaRAID/MegaCli/MegaCli64
 Defaults!MEGACLI !syslog, !pam_session  # avoid lots of log noise
 ... and ...
 {{user}} ALL=(ALL) NOPASSWD: MEGACLI
 ```
 
-### megacli wrapper
-```
-#!/bin/sh
-/opt/MegaRAID/MegaCli/MegaCli64 $* -NoLog
-```
