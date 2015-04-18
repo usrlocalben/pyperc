@@ -80,6 +80,10 @@ class PyPerc(object):
         # patrol for events without timestamps, and try to create them
         total_fixups = 0
         total_resets = 0
+        total_failed = 0
+
+        timeset_seconds = None
+        timeset_datetime = None
         for event in reversed(self.events.data):
             if event.code == 44:
                 line = event.data.split("\n")[0]
@@ -87,10 +91,19 @@ class PyPerc(object):
                 timeset_datetime = event.time
                 total_resets += 1
             elif event.sslr:
-                adjustment = timedelta(seconds=(timeset_seconds - event.sslr))
-                event.time = timeset_datetime - adjustment
-                total_fixups += 1
-        print 'fixed', total_fixups, 'timestamps and saw', total_resets, 'clock-sets.'
+                if timeset_seconds:
+                    adjustment = timedelta(seconds=(timeset_seconds - event.sslr))
+                    event.time = timeset_datetime - adjustment
+                    total_fixups += 1
+                else:
+                    total_failed += 1
+
+            if event.code == 0:
+                # invalidate the time data if we pass a Power On event (code==0)
+                timeset_seconds = None
+                timeset_datetime = None
+
+        print 'fixed', total_fixups, 'timestamps and saw', total_resets, 'clock-sets.', total_failed, ' could not be fixed.'
 
     def merge_event_file(self, fname):
         total_events = 0
