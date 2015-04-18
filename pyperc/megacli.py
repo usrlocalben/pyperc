@@ -383,26 +383,19 @@ class MegaCLI(object):
     def get_PDList_raw(self):
 
         lines = self.megarun(['-PDList'])
-        raw = "\n".join(lines)
-        blocks = "\n".join(lines).split("\n\n")
-        xx = blocks.pop(0).strip()
-        yy = blocks.pop()
-        if xx != 'Adapter #0':
-            raise Exception("expected first pdlist block to have Adapter #0")
-        if yy != '':
-            raise Exception("expected empty last block in pdlist output")
-
         pdlist = []
-        for block in blocks:
-            if block == '': continue
 
-            a = {}
-            for line in block.split("\n"):
-                try:
-                    l,r = re.match(r"^([\w\'\(\)\-\. ]+):\W*(.*)$",line).groups()
-                except:
-                    print "failed to match/split [%s]" % line
-                    raise
+        a = {}
+        for line in lines:
+            if ':' not in line: continue
+
+            left, right = megasplit(line)
+
+            if left == 'Enclosure Device ID':
+                if a:
+                    pdlist.append(a)
+                    a = {}
+
                 #XXX special case for the drive data because we need to preserve exact chars
                 """
 Inquiry Data:             Z1M1971LST500NM0011                             SN03
@@ -413,10 +406,13 @@ Inquiry Data: BTWL3134009C300PGN  INTEL SSDSC2BB300G4                     D20103
               01234567890123456789012345678901234567890123456789012345678901234567890
                         1111111111222222222233333333334444444444555555555566666666667
                 """
-                if l.strip() == 'Inquiry Data':
-                    a[l.strip()] = line[14:]
-                else:
-                    a[l.strip()] = r.strip()
+            if line.startswith('Inquiry Data'):
+                a['Inquiry Data'] = line[14:]
+            else:
+                a[left] = right
+
+        #endfor lines
+        if a:
             pdlist.append(a)
 
         return pdlist
