@@ -51,81 +51,84 @@ class MegaCLI(object):
 
         lines = self.megarun(['-LdPdInfo'])
 
-        lines.pop(0) # ''
-        lines.pop(0) # 'Adapter #0'
-        lines.pop(0) # ''
-        l,r = megasplit(lines.pop(0)) # 'Number of Virtual Disks: 2'
-        if l != 'Number of Virtual Disks':
-            raise ValueError("expected 'Number of Virtual Disks'")
-        total_volumes = int(r)
+        current_vd = None
+        current_pd = None
+        current_span = None
+        current_pd_slot_id = None
+        current_pd_device_id = None
 
-        # rejoin and resplit
-        chunks = "\n".join(lines).split("Virtual Drive: ")
-        chunks.pop(0) # remove empty element -- present since the data begins with the explode-pattern
+        pd_to_ld = {}
+        def emit(vd, span, pd, device_id):
+            print 'emit', vd, span, pd, device_id
+            if device_id in pd_to_ld:
+                raise Exception("physical-device is used by multiple volumes?")
+            pd_to_ld[device_id] = {'ld': vd, 'span': span, 'unit': pd}
 
         ldmap = {}
-        pd_to_ld = {}
-        for vdblock in chunks:
 
-            lines = vdblock.split("\n")
-            l = lines.pop(0)
-            fields = l.split(' ')
-            volume_id = int(fields[0])
-            target_id = int(fields[3][0:-1])
+        for line in lines:
 
-            #
-            # vdnum is 0,1,2,...,n, where target_id could be 1,3,4,7.
-            #
-            ldmap[volume_id] = target_id
+            if line.startswith('Number of Virtual Disks:'):
+                left, right = megasplit(line)
+                number_of_virtual_disks = int(right)
 
-            #
-            # skip past the LU details
-            #
-            while True:
-                x = lines.pop(0)
-                if x.startswith('Number of Spans'): break
+            elif line.startswith('Virtual Drive:'): # 'Virtual Drive: 0 (Target Id: 0)'
+                left, right = megasplit(line)
+                vd_str, target_str = re.match(r"([0-9]+)\W+\(Target Id:\W+([0-9]+)\)", right).groups()
+                vd_id = int(vd_str)
+                target_id = int(target_str)
 
-            #
-            # parse lines, setting state, and emit complete records on disk/span-edges
-            #
-            current_pd = None
-            current_span = None
-            current_pd_device_id = None
-            current_pd_slot_number = None
-            current_pd_enclosure_device_id = None
+                ldmap[vd_id] = target_id
+                if current_vd is not None:
+                    emit(current_vd, current_span, current_pd, current_pd_device_id)
+                    current_pd = None
+                    current_span = None
+                current_vd = vd_id
 
-            def emit(volume, span, unit, device):
-                #print 'span:', span, ', spandev:', unit, ', device:', device
-                if device in pd_to_ld:
-                    raise Exception("physical-device is used by multiple volumes?")
-                pd_to_ld[device] = {'ld': volume, 'span': span, 'unit': unit}
+            elif line.startswith('Number Of Drives per span:'): # 'Number Of Drives per span:2'
+                left, right = megasplit(line)
+                drives_per_span = int(right)
 
-            for line in lines:
-                if line.startswith('Span: '):
-                    span_id = line.split(' ')[1]
-                    if current_span:
-                        emit(volume_id, current_span, current_pd, current_pd_device_id)
-                        current_pd = None
-                    current_span = span_id
-                elif line.startswith('PD: '):
-                    pd_id = line.split(' ')[1]
-                    if current_pd:
-                        emit(volume_id, current_span, current_pd, current_pd_device_id)
-                    current_pd = pd_id
-                elif line.startswith('Enclosure Device ID: '):
-                    enc = line[21:].strip()
-                    if enc == 'N/A': enc = ''
-                    current_pd_enclosure_device_id = enc
-                elif line.startswith('Slot Number: '):
-                    current_pd_slot_number = line[13:]
-                elif line.startswith('Device Id: '):
-                    current_pd_device_id = line[11:]
-            #endfor lines
-            if current_pd:
-                emit(volume_id, current_span, current_pd, current_pd_device_id)
+            elif line.startswith('Span Depth:'):
+                left, right = megasplit(line)
+                span_depth = int(right)
 
-        #endfor chunks
-        if len(ldmap) != total_volumes:
+            elif line.startswith('Number of Spans'):
+                left, right = megasplit(line)
+                number_of_spans = int(right)
+
+            elif line.startswith('Span:'): # 'Span: 0 - Number of PDs: 2'
+                left, right = megasplit(line)
+                span_id = int(right.split(' ')[0])
+
+                if current_span is not None:
+                    emit(current_vd, current_span, current_pd, current_pd_device_id)
+                    current_pd = None
+
+                current_span = span_id
+
+            elif line.startswith('PD:'): # 'PD: 0 Information'
+                left, right = megasplit(line)
+                pd_id = int(right.split(' ')[0])
+                if current_pd is not None:
+                    emit(current_vd, current_span, current_pd, current_pd_device_id)
+                current_pd = pd_id
+
+            elif line.startswith('Slot Number:'):
+                left, right = megasplit(line)
+                slot_id = int(right)
+                current_pd_slot_id = slot_id
+
+            elif line.startswith('Device Id:'):
+                left, right = megasplit(line)
+                device_id = int(right)
+                current_pd_device_id = device_id
+
+        # endfor lines
+        if current_pd is not None:
+            emit(current_vd, current_span, current_pd, current_pd_device_id)
+
+        if len(ldmap) != number_of_virtual_disks:
             raise Exception("get_ldpd_map chunks did not match the indicated volume count")
 
         return ldmap, pd_to_ld
