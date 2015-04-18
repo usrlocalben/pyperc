@@ -15,7 +15,7 @@ class MegaEvent(object):
 
         if int(code) not in MEGA_EVENT_CODES:
             raise ValueError("unhandled code level(%s), code(%s), descr(%s)" %\
-                                (a['level'], a['code'], a['description']))
+                                (level, code, description))
 
         self.id = int(id)
         self.code = int(code)
