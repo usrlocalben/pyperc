@@ -1,14 +1,15 @@
 #!/usr/bin/env python2.7
 
-import time
+import sys
 import json
-import urlparse
 from itertools import takewhile
 
+from twisted.python import log
 from twisted.internet import reactor
 from twisted.web.server import Site
 from twisted.web.static import File
 from twisted.web.resource import Resource
+from twisted.web.util import Redirect
 from twisted.internet.protocol import Factory, Protocol
 from txsockjs.factory import SockJSResource
 from txsockjs.utils import broadcast
@@ -16,24 +17,31 @@ from txsockjs.utils import broadcast
 from pyperc import PyPerc, MegaCLI, MegaCLIRunner
 
 
-PERC_POLL_PERIOD = 1
-pa = PyPerc(
-    megacli=MegaCLI(
-        runner=MegaCLIRunner(exe="/opt/MegaRAID/MegaCli/MegaCli64", adapter=0)
-    )
-)
+LISTEN_ADDRESS = '0.0.0.0'  # comma-separated list
+LISTEN_PORT = 50001
+PERC_POLL_PERIOD = 1.0      # seconds
+MEGACLI_EXE = '/opt/MegaRAID/MegaCli/MegaCli64'
+
+log.startLogging(sys.stdout)
 
 connected_users = set()
 
-def percpoll(s):
-    last_event = pa.last_event()
-    pa.poll()
-    new_event = pa.last_event()
+pyperc = PyPerc(
+    megacli=MegaCLI(
+        runner=MegaCLIRunner(exe=MEGACLI_EXE, adapter=0)
+    )
+)
+
+
+def poll_pyperc():
+    last_event = pyperc.last_event()
+    pyperc.poll()
+    new_event = pyperc.last_event()
     if new_event != last_event:
         broadcast('come get em', connected_users)
-    reactor.callLater(PERC_POLL_PERIOD, percpoll, "again")
+    reactor.callLater(PERC_POLL_PERIOD, poll_pyperc)
 
-reactor.callLater(0, percpoll, "first")
+reactor.callLater(0, poll_pyperc)
 
 
 def limited_to(limit, iterable):
@@ -72,11 +80,11 @@ class PercApiInfo(Resource):
 
         return json.dumps({
             'success': True,
-            'ad': pa.adapter_details,
-            'cf': pa.config_details,
-            'ld': pa.ldinfo,
-            'pd': pa.pdinfo,
-            'pd_to_ld': pa.pd_to_ld,
+            'ad': pyperc.adapter_details,
+            'cf': pyperc.config_details,
+            'ld': pyperc.ldinfo,
+            'pd': pyperc.pdinfo,
+            'pd_to_ld': pyperc.pd_to_ld,
         })
 
 
@@ -97,13 +105,13 @@ class PercApiEvents(Resource):
         ignore = (30, 113, 236)
 
         if not since:
-            events = reversed(pa.events.data)
+            events = reversed(pyperc.events.data)
             events = (item for item in events if item.code not in (30, 113, 236))
             if limit is not None:
                 events = limited_to(limit, events)
             events = (item.to_dict() for item in events)
         else:
-            events = pa.events.find_gt(int(since), limit=limit, filterfunc=lambda event: event.id not in (30, 113, 236))
+            events = pyperc.events.find_gt(int(since), limit=limit, filterfunc=lambda event: event.id not in (30, 113, 236))
             events = (item.to_dict() for item in events)
 
         events = (item for item in events if item['code'] not in ignore)
@@ -112,6 +120,7 @@ class PercApiEvents(Resource):
             'success': True,
             'events': events,
             })
+
 
 static = Resource()
 static.putChild("jquery", File("bower_components/jquery"))
@@ -129,11 +138,15 @@ api.putChild("events", PercApiEvents())
 api.putChild("adapter", PercApiInfo())
 
 root = Resource()
+root.putChild("", Redirect('/home'))
 root.putChild("api", api)
 root.putChild("static", static)
 root.putChild("home", File("static/dashboard.html"))
 root.putChild("chan", SockJSResource(Factory.forProtocol(EventBus)))
 
-reactor.listenTCP(50001, Site(root))
+for address in LISTEN_ADDRESS.split(','):
+    print 'Will listen on %s:%d' % (address, LISTEN_PORT)
+    reactor.listenTCP(LISTEN_PORT, Site(root), interface=address)
+
 reactor.run()
 
