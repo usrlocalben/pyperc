@@ -9,8 +9,8 @@ requirejs.config {
   }
 }
 
-require ['jquery', 'bootstrap', 'knockout', 'moment', 'sockjs'],
-         (jquery, bootstrap, ko, moment, SockJS) ->
+require(['jquery', 'bootstrap', 'knockout', 'moment', 'sockjs'],\
+        (jquery, bootstrap, ko, moment, SockJS) ->
 
   MAX_EVENTS = 50
   EVENT_POLLING_PERIOD = 4000
@@ -84,3 +84,4 @@ require ['jquery', 'bootstrap', 'knockout', 'moment', 'sockjs'],
     vm.loadData()
     connectEventBus()
 
+)
