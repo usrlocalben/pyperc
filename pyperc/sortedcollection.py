@@ -20,15 +20,11 @@ class NotUniqueError(Exception):
 
 class SortedCollection(object):
 
-    def __init__(self, limit=None):
-        #self.keyfunc = keyfunc
+    def __init__(self):
         self.keys = []
         self.data = []
-        #self.limit = int(limit) if limit else None
 
     def insert(self, id_, item):
-        #item_value = self.keyfunc(item)
-        #item_value = item['id_']
         item_value = id_
         idx = bisect_left(self.keys, item_value)
         try:
@@ -38,10 +34,6 @@ class SortedCollection(object):
             pass
         self.keys.insert(idx, item_value)
         self.data.insert(idx, item)
-
-        #if self.limit and (len(self.keys) > self.limit * 2):
-        #    self.keys[:] = self.keys[-self.limit:]
-        #    self.data[:] = self.data[-self.limit:]
 
     """
     def merge(self, items, keyfunc):
@@ -66,13 +58,13 @@ class SortedCollection(object):
         except IndexError:
             raise DoesNotExist
 
-    def find_one(self, id_, filter=None):
+    def find_one(self, id_, filterfunc=None):
         idx = bisect_left(self.keys, id_)
         try:
             if self.keys[idx] == id_:
                 item = self.data[idx]
-                if filter:
-                    return item if filter(item) else None
+                if filterfunc:
+                    return item if filterfunc(item) else None
                 else:
                     return item
             else:
@@ -80,7 +72,7 @@ class SortedCollection(object):
         except IndexError:
             return None
 
-    def find_gt(self, id_, skip=0, limit=None, filter=None):
+    def find_gt(self, id_, skip=0, limit=None, filterfunc=None):
         idx = bisect_left(self.keys, id_)
 
         try:
@@ -91,7 +83,7 @@ class SortedCollection(object):
 
         emit_count = 0
         while idx < len(self.data):
-            if filter and not filter(self.data[idx]):
+            if filterfunc and not filterfunc(self.data[idx]):
                 pass
             else:
                 if skip:
@@ -103,12 +95,12 @@ class SortedCollection(object):
                     emit_count += 1
             idx += 1
                 
-    def find(self, skip=0, limit=None, filter=None, reverse=False):
+    def find(self, skip=0, limit=None, filterfunc=None, reverse=False):
         data = self.data
         if reverse:
             data = reversed(data)
-        if filter:
-            data = (item for item in data if filter(item))
+        if filterfunc:
+            data = (item for item in data if filterfunc(item))
         emit_count = 0
         for item in data:
             if skip:

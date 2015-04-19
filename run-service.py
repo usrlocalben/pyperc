@@ -16,10 +16,10 @@ from pyperc import PyPerc, MegaCLI, MegaCLIRunner
 
 PERC_POLL_PERIOD = 1
 pa = PyPerc(
-        megacli=MegaCLI(
-            runner=MegaCLIRunner(exe="/opt/MegaRAID/MegaCli/MegaCli64", adapter=0)
-            )
-        )
+    megacli=MegaCLI(
+        runner=MegaCLIRunner(exe="/opt/MegaRAID/MegaCli/MegaCli64", adapter=0)
+    )
+)
 
 def percpoll(s):
     pa.poll()
@@ -83,7 +83,7 @@ class PercApiEvents(Resource):
                 events = limited_to(limit, events)
             events = (item.to_dict() for item in events)
         else:
-            events = pa.events.find_gt(int(since), limit=limit, filter=lambda event: event.id not in (30, 113, 236))
+            events = pa.events.find_gt(int(since), limit=limit, filterfunc=lambda event: event.id not in (30, 113, 236))
             events = (item.to_dict() for item in events)
 
         events = (item for item in events if item['code'] not in ignore)

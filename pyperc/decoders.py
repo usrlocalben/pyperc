@@ -91,19 +91,19 @@ def decode_cache_policy(val):
     try:
         cra = m[xra]
     except KeyError:
-        raise ValueError("unhandled cache policy (readahead) '%s'"%(xra))
+        raise ValueError("unhandled cache policy (readahead) '%s'" % xra)
 
     m = {'Cached': 'Cached', 'Direct': 'Direct'}
     try:
         ce = m[xce]
     except KeyError:
-        raise ValueError("unhandled cache policy (enable) '%s'"%(xce))
+        raise ValueError("unhandled cache policy (enable) '%s'" % xce)
 
     m = {'No Write Cache if Bad BBU': 'NonCachedBadBBU', 'Write Cache OK if Bad BBU': 'CachedBadBBU'}
     try:
         cbbu = m[xcbbu]
     except KeyError:
-        raise ValueError("unhandled cache policy (bbusafety) '%s'"%(xcbbu))
+        raise ValueError("unhandled cache policy (bbusafety) '%s'" % xcbbu)
 
     return cw + '-' + cra + '-' + ce + '-' + cbbu
 
@@ -112,13 +112,13 @@ def decode_event_time(val):
 
 def decode_stripe_size(val):
     m = {
-         '16 KB'  :   16,
-         '32 KB'  :   32,
-         '64 KB'  :   64,
-        '128 KB' :  128,
-        '256 KB' :  256,
-        '512 KB' :  512,
-        '1.0 MB' : 1024,
+         '16 KB':   16,
+         '32 KB':   32,
+         '64 KB':   64,
+        '128 KB':  128,
+        '256 KB':  256,
+        '512 KB':  512,
+        '1.0 MB': 1024,
     }
     try:
         return m[val]

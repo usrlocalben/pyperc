@@ -116,8 +116,8 @@ class MegaEvent(object):
                     yield emit()
                     emit_count += 1
                     reset()
-                hex, = match.groups()
-                sd['seqnum'] = int(hex, 16)
+                seqnum_hex, = match.groups()
+                sd['seqnum'] = int(seqnum_hex, 16)
             elif line.startswith('Time:'):
                 _, timestr = megasplit(line)
                 sd['time'] = decode_event_time(timestr)
@@ -126,12 +126,12 @@ class MegaEvent(object):
                 sd['sslr'], = match.groups()
             elif line.startswith('Code:'):
                 match = re.match(r"Code:\W*0x([0-9a-f]+)", line)
-                hex, = match.groups()
-                sd['code'] = int(hex, 16)
+                code_hex, = match.groups()
+                sd['code'] = int(code_hex, 16)
             elif line.startswith('Locale:'):
                 match = re.match(r"Locale:\W*0x([0-9a-f]+)", line)
-                hex, = match.groups()
-                sd['locale'] = int(hex, 16)
+                locale_hex, = match.groups()
+                sd['locale'] = int(locale_hex, 16)
             elif line.startswith('Class:'):
                 match = re.match(r"Class:\W*([0-9]+)", line)
                 levelstr, = match.groups()

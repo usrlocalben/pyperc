@@ -381,8 +381,8 @@ class MegaCLI(object):
         lines.pop(0) # ''
 
         lines.pop() # ''
-        str = lines.pop() # 'Success in AdpEventLog'
-        if str != 'Success in AdpEventLog':
+        success_text = lines.pop() # 'Success in AdpEventLog'
+        if success_text != 'Success in AdpEventLog':
             raise Exception('expected Success in AdpEventLog')
         lines.pop() # ''
 
@@ -426,24 +426,24 @@ class MegaCLI(object):
         def get_PDList_raw():
             lines = self.megarun(['-PDList'])
 
-            a = {}
+            pd_info = {}
             for line in lines:
                 if ':' not in line: continue
                 left, right = megasplit(line)
 
                 # each PD block starts with this entry
-                if left == 'Enclosure Device ID' and a:
-                    yield a
-                    a = {}
+                if left == 'Enclosure Device ID' and pd_info:
+                    yield pd_info
+                    pd_info = {}
 
                 if line.startswith('Inquiry Data'):
-                    a['Inquiry Data'] = line[14:] # see example above
+                    pd_info['Inquiry Data'] = line[14:] # see example above
                 else:
-                    a[left] = right
+                    pd_info[left] = right
 
             #endfor lines
-            if a:
-                yield a
+            if pd_info:
+                yield pd_info
 
         pdidx = {}
         pdinfo = []
