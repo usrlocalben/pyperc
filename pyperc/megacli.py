@@ -7,6 +7,7 @@ import re
 import subprocess
 from utils import megasplit
 from decoders import *
+from megatime import megacli_strftime, query_ntp
 
 
 class MegaCLIRunner(object):
@@ -507,6 +508,19 @@ class MegaCLI(object):
 
     def dump_events_deleted(self, filename):
         self.megarun(['-AdpEventLog', '-IncludeDeleted', '-f', filename])
+
+
+    def maybe_set_time(self, ntp_host='127.0.0.1', ntp_timeout=5):
+        try:
+            stratum, utcnow = query_ntp(host=ntp_host, timeout=ntp_timeout)
+        except:
+            print 'could not get time via ntp from', ntp_host
+        else:
+            if stratum > 3:
+                print 'ntp host stratum, %d, is too high.  not updating controller' % stratum
+            else:
+                out = self.megarun(['-AdpSetTime', megacli_strftime(utcnow)])
+                print out
 
 
 """
