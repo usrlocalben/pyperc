@@ -1,6 +1,7 @@
 requirejs.config {
   baseUrl: 'static',
   paths: {
+    sockjs: 'sockjs/sockjs.min',
     moment: 'moment/min/moment.min',
     jquery: 'jquery/dist/jquery.min',
     knockout: 'knockout/dist/knockout',
@@ -8,14 +9,13 @@ requirejs.config {
   }
 }
 
-require ['jquery', 'bootstrap', 'knockout', 'moment'], (jquery, bootstrap, ko, moment) ->
+require ['jquery', 'bootstrap', 'knockout', 'moment', 'sockjs'],
+         (jquery, bootstrap, ko, moment, SockJS) ->
 
   MAX_EVENTS = 50
   EVENT_POLLING_PERIOD = 4000
 
   delay = (ms, func) -> setTimeout func, ms
-
-
 
   class ViewModel
     constructor: () ->
@@ -44,7 +44,6 @@ require ['jquery', 'bootstrap', 'knockout', 'moment'], (jquery, bootstrap, ko, m
           $.each data.events.reverse(), (idx, item) =>
             @last_event = Math.max @last_event, item.id
             @events.push item
-          delay EVENT_POLLING_PERIOD, @pollEvents
 
       @pollEvents = =>
         $.get('/api/events/', {since: @last_event}, (data, status) =>
@@ -54,8 +53,6 @@ require ['jquery', 'bootstrap', 'knockout', 'moment'], (jquery, bootstrap, ko, m
             if @events().length > MAX_EVENTS
               @events.pop
           )
-        ).always(=>
-          delay EVENT_POLLING_PERIOD, @pollEvents
         )
 
       @numberWithCommas = (x) -> x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
@@ -65,6 +62,25 @@ require ['jquery', 'bootstrap', 'knockout', 'moment'], (jquery, bootstrap, ko, m
   vm = new ViewModel()
   ko.applyBindings vm
 
+  attempts = 0
+  attempt_delay = 500
+  socket = null
+
+  connectEventBus = ->
+    socket = new SockJS('/chan')
+    if attempt_delay < 15000
+      attempt_delay *= 2
+    attempts += 1
+    socket.onopen = ->
+      attempts = 0
+      attempt_delay = 500
+    socket.onclose = ->
+      socket = null
+      delay attempt_delay, connectEventBus
+    socket.onmessage = (e) ->
+      vm.pollEvents()
+
   $ ->
     vm.loadData()
+    connectEventBus()
 

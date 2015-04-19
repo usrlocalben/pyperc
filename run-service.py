@@ -9,6 +9,9 @@ from twisted.internet import reactor
 from twisted.web.server import Site
 from twisted.web.static import File
 from twisted.web.resource import Resource
+from twisted.internet.protocol import Factory, Protocol
+from txsockjs.factory import SockJSResource
+from txsockjs.utils import broadcast
 
 from pyperc import PyPerc, MegaCLI, MegaCLIRunner
 
@@ -20,9 +23,14 @@ pa = PyPerc(
     )
 )
 
+connected_users = set()
+
 def percpoll(s):
-    pa.poll()
     last_event = pa.last_event()
+    pa.poll()
+    new_event = pa.last_event()
+    if new_event != last_event:
+        broadcast('come get em', connected_users)
     reactor.callLater(PERC_POLL_PERIOD, percpoll, "again")
 
 reactor.callLater(0, percpoll, "first")
@@ -35,6 +43,19 @@ def limited_to(limit, iterable):
             return
         yield item
         total += 1
+
+
+class EventBus(Protocol):
+    def connectionMade(self):
+        connected_users.add(self.transport)
+        print 'join', self.transport.getPeer(), ' -- users online:', len(connected_users)
+
+    def dataReceived(self, data):
+        print 'rx:', data
+
+    def connectionLost(self, data):
+        connected_users.remove(self.transport)
+        print 'leave', self.transport.getPeer(), ' -- users online:', len(connected_users)
 
 
 class PercApiInfo(Resource):
@@ -95,6 +116,7 @@ class PercApiEvents(Resource):
 static = Resource()
 static.putChild("jquery", File("bower_components/jquery"))
 static.putChild("moment", File("bower_components/moment"))
+static.putChild("sockjs", File("bower_components/sockjs"))
 static.putChild("knockout", File("bower_components/knockout"))
 static.putChild("bootstrap", File("bower_components/bootstrap"))
 static.putChild("bootswatch", File("bower_components/bootswatch"))
@@ -110,6 +132,7 @@ root = Resource()
 root.putChild("api", api)
 root.putChild("static", static)
 root.putChild("home", File("static/dashboard.html"))
+root.putChild("chan", SockJSResource(Factory.forProtocol(EventBus)))
 
 reactor.listenTCP(50001, Site(root))
 reactor.run()
