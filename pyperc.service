@@ -1,0 +1,14 @@
+[Unit]
+Description=pyperc
+After=network.target
+
+[Service]
+Type=simple
+User={{ user }}
+Group={{ group }}
+Environment="PATH={{ path/to/venv/bin }}:/usr/local/sbin:/usr/local/bin:/usr/bin"
+ExecStart={{ path/to/pyperc/ }}/run-service.py
+
+[Install]
+WantedBy=multi-user.target
+
