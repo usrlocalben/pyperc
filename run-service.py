@@ -5,11 +5,10 @@ import json
 import urlparse
 from itertools import takewhile
 
-import twisted.web.server
-
 from twisted.internet import reactor
-from twisted.web.resource import Resource
+from twisted.web.server import Site
 from twisted.web.static import File
+from twisted.web.resource import Resource
 
 from pyperc import PyPerc, MegaCLI, MegaCLIRunner
 
@@ -112,6 +111,6 @@ root.putChild("api", api)
 root.putChild("static", static)
 root.putChild("home", File("static/dashboard.html"))
 
-reactor.listenTCP(50001, twisted.web.server.Site(root))
+reactor.listenTCP(50001, Site(root))
 reactor.run()
 
