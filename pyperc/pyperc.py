@@ -13,6 +13,7 @@ from events import MegaEvent
 from sortedcollection import SortedCollection, NotUniqueError
 
 MEGACLI_EXE = '/usr/local/sbin/megacli'
+TIMESET_EVENT_CODE = 44
 
 class PyPerc(object):
 
@@ -85,7 +86,7 @@ class PyPerc(object):
         timeset_seconds = None
         timeset_datetime = None
         for event in reversed(self.events.data):
-            if event.code == 44:
+            if event.code == TIMESET_EVENT_CODE:
                 line = event.data.split("\n")[0]
                 timeset_seconds = int(line.split(' ')[-1])
                 timeset_datetime = event.time
@@ -99,11 +100,12 @@ class PyPerc(object):
                     total_failed += 1
 
             if event.code == 0:
-                # invalidate the time data if we pass a Power On event (code==0)
+                # invalidate the time data as we pass a Power On event (code==0)
                 timeset_seconds = None
                 timeset_datetime = None
 
-        print 'fixed', total_fixups, 'timestamps and saw', total_resets, 'clock-sets.', total_failed, ' could not be fixed.'
+        print 'fixed %d timestamps and saw %d clock-sets. %d could not be fixed.' %\
+              (total_fixups, total_resets, total_failed)
 
     def merge_event_file(self, fname):
         total_events = 0
@@ -144,10 +146,4 @@ class PyPerc(object):
 
         print 'poll_events merged', total_events, 'new events'
         return total_events
-
-
-
-
-#if __name__ == '__main__':
-#    sys.exit(main())
 

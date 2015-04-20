@@ -6,9 +6,10 @@ http://souptonuts.sourceforge.net/code/queryTimeServer.c.html
 http://stackoverflow.com/questions/8805832/number-of-seconds-from-1st-january-1900-to-start-of-unix-epoch
 """
 
+import socket
 import struct
 from datetime import datetime
-from socket import socket, AF_INET, SOCK_DGRAM, timeout
+from socket import  socket, AF_INET, SOCK_DGRAM
 
 NTP_PORT = 123
 BUFFER_SIZE = 1024
@@ -40,7 +41,7 @@ def query_ntp(host='127.0.0.1', timeout=5):
 if __name__ == '__main__':
     try:
         strat, dt = query_ntp()
-    except timeout:
+    except socket.timeout:
         print 'request timed out.'
     else:
         print 'stratum:', strat
