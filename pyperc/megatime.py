@@ -6,17 +6,20 @@ http://souptonuts.sourceforge.net/code/queryTimeServer.c.html
 http://stackoverflow.com/questions/8805832/number-of-seconds-from-1st-january-1900-to-start-of-unix-epoch
 """
 
-import socket
 import struct
 from datetime import datetime
-from socket import  socket, AF_INET, SOCK_DGRAM
+from socket import (
+    socket, AF_INET, SOCK_DGRAM,
+    timeout as socket_timeout
+)
 
 NTP_PORT = 123
 BUFFER_SIZE = 1024
 TIME1970 = 2208988800L # 1970-01-01 00:00:00
 
-# "20150419 21:51:00"
+
 def megacli_strftime(val):
+    # "20150419 21:51:00"
     return val.strftime("%Y%m%d %H:%M:%S")
 
 
@@ -41,7 +44,7 @@ def query_ntp(host='127.0.0.1', timeout=5):
 if __name__ == '__main__':
     try:
         strat, dt = query_ntp()
-    except socket.timeout:
+    except socket_timeout:
         print 'request timed out.'
     else:
         print 'stratum:', strat

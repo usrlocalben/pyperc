@@ -32,9 +32,9 @@ def decode_minutes(val):
         raise ValueError("dont know how to parse minutes '%s'" % val)
 
 RAIDLEVEL_TEXT = {
-     'Primary-1, Secondary-0, RAID Level Qualifier-0': '10',
-     'Primary-0, Secondary-0, RAID Level Qualifier-0': '0',
-     'Primary-6, Secondary-0, RAID Level Qualifier-3': '6',
+    'Primary-1, Secondary-0, RAID Level Qualifier-0': '10',
+    'Primary-0, Secondary-0, RAID Level Qualifier-0': '0',
+    'Primary-6, Secondary-0, RAID Level Qualifier-3': '6',
 }
 def decode_raidlevel(val):
     try:

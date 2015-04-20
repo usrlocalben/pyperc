@@ -1,13 +1,6 @@
 #!/usr/bin/env python2.7
 
-import os
-import re
-import sys
-import json
-import time
-import pprint
-import subprocess
-from datetime import datetime, timedelta
+from datetime import timedelta
 
 from events import MegaEvent
 from sortedcollection import SortedCollection, NotUniqueError
@@ -15,12 +8,13 @@ from sortedcollection import SortedCollection, NotUniqueError
 MEGACLI_EXE = '/usr/local/sbin/megacli'
 TIMESET_EVENT_CODE = 44
 
+
 class PyPerc(object):
 
     def __init__(self, megacli):
         self.megacli = megacli
-        self.load() # load first, because it can cause events to occur
-        self.events = SortedCollection() #limit=1000)
+        self.load()    # load first, because it may generate events
+        self.events = SortedCollection()
         self.load_event_history()
         self.loaded = True
 
@@ -68,10 +62,7 @@ class PyPerc(object):
 
     def load_event_history(self):
         tmpnm = '/tmp/megacli_all_events.txt'
-        #try:
         self.megacli.dump_events_deleted(tmpnm)
-        #except CalledProcessError:
-        #    pass
         total_events, _ = self.merge_event_file(tmpnm)
        
         print 'read', total_events, 'events from controller'
@@ -128,7 +119,6 @@ class PyPerc(object):
             last_id = 0
 
         newest, _ = self.megacli.get_event_markers()
-        #print 'polling: my latest id is', last_id, 'and the controllers is', newest
         if last_id == newest:
             return 0
 

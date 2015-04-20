@@ -2,6 +2,7 @@
 import os
 import re
 
+
 def megaraid_devs():
 
     def find_megaraid_devices():

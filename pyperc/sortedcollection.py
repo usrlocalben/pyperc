@@ -13,10 +13,14 @@ Usually, we only care about
 
 from bisect import bisect_left
 
+
 class DoesNotExist(Exception):
     pass
+
+
 class NotUniqueError(Exception):
     pass
+
 
 class SortedCollection(object):
 

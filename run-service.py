@@ -2,7 +2,6 @@
 
 import sys
 import json
-from itertools import takewhile
 
 from twisted.python import log
 from twisted.internet import reactor
@@ -68,16 +67,9 @@ class EventBus(Protocol):
 
 class PercApiInfo(Resource):
     isLeaf = True
-    request_count = 0
 
     def render_GET(self, request):
-
-        #remote_host = request.getHost() #( twisted.internet.address.IPv4Address .host, .port, .type )
-        #print "adapter %s %s" % (remote_host.host, request.uri)
-
-        self.request_count += 1
         request.setHeader("Content-type", "application/json")
-
         return json.dumps({
             'success': True,
             'ad': pyperc.adapter_details,
@@ -90,14 +82,8 @@ class PercApiInfo(Resource):
 
 class PercApiEvents(Resource):
     isLeaf = True
-    request_count = 0
 
     def render_GET(self, request):
-        #remote_host = request.getHost() #( twisted.internet.address.IPv4Address .host, .port, .type )
-        #print "events - %s %s" % (remote_host.host, request.uri)
-
-        self.request_count += 1
-        request.setHeader("Content-type", "application/json")
 
         since = request.args.get('since', [None])[0]
         limit = request.args.get('limit', [None])[0]
@@ -116,6 +102,8 @@ class PercApiEvents(Resource):
 
         events = (item for item in events if item['code'] not in ignore)
         events = sorted(events, key=lambda item: item['id'])
+
+        request.setHeader("Content-type", "application/json")
         return json.dumps({
             'success': True,
             'events': events,
