@@ -6,6 +6,7 @@ require = {
     moment: 'moment/min/moment.min'
     jquery: 'jquery/dist/jquery.min'
     knockout: 'knockout/dist/knockout'
+    'ko.plus': 'ko.plus/dist/ko.plus.min'
     bootstrap: 'bootstrap/dist/js/bootstrap.min'
   }
   shim: {

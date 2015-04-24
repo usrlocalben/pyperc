@@ -1,4 +1,4 @@
-define ['knockout', 'moment', 'eventbus', "text!./status_page.html"], (ko, moment, eventbus, pageHtml) ->
+define ['knockout', 'moment', 'eventbus', 'text!./status_page.html', 'ko.plus'], (ko, moment, eventbus, pageHtml) ->
 
   MAX_EVENTS = 50
   EVENT_POLLING_PERIOD = 4000
@@ -12,31 +12,39 @@ define ['knockout', 'moment', 'eventbus', "text!./status_page.html"], (ko, momen
       @adapter = ko.observable()
       @volumes = ko.observableArray()
       @devices = ko.observableArray()
-      @loaded = ko.observable(false)
 
-      @moment = (x) ->
-        moment(x)
+      @moment = (x) -> moment(x)
+      @numberWithCommas = (x) -> x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+      @sectorsToMB = (x) -> Math.floor x * 512 / (1000 * 1000)
 
-      @loadData = =>
-        $.get '/api/adapter/', {}, (data, status) =>
-          @adapter(data.ad)
-          ko.utils.arrayPushAll @volumes, data.ld
-          @devices.removeAll()
-          $.each(data.pd, (idx, item) =>
-            if item.device of data.pd_to_ld
-              item.member = true
-              item.volume = data.pd_to_ld[item.device].ld
-            else
-              item.member = false
-            @devices.push item
-          )
-          @loaded(true)
+      @loadMain = ko.command(=>
+        return $.get('/api/adapter/', {})
+      ).done((data) =>
+        @adapter(data.ad)
+        ko.utils.arrayPushAll @volumes, data.ld
+        @devices.removeAll()
+        $.each(data.pd, (idx, item) =>
+          if item.device of data.pd_to_ld
+            item.member = true
+            item.volume = data.pd_to_ld[item.device].ld
+          else
+            item.member = false
+          @devices.push item
+        )
+      ).fail((error) =>
+        console.log('failure while loading adapter data')
+      )
 
-        $.get '/api/events/', {limit: MAX_EVENTS}, (data, status) =>
-          @last_event = 0
-          $.each data.events.reverse(), (idx, item) =>
-            @last_event = Math.max @last_event, item.id
-            @events.push item
+      @loadEvents = ko.command(=>
+        return $.get('/api/events/', {limit: MAX_EVENTS})
+      ).done((data) =>
+        @last_event = 0
+        $.each data.events.reverse(), (idx, item) =>
+          @last_event = Math.max @last_event, item.id
+          @events.push item
+      ).fail((error) =>
+        console.log('failure while loading events')
+      )
 
       @pollEvents = =>
         $.get('/api/events/', {since: @last_event}, (data, status) =>
@@ -48,11 +56,8 @@ define ['knockout', 'moment', 'eventbus', "text!./status_page.html"], (ko, momen
           )
         )
 
-      @numberWithCommas = (x) -> x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-
-      @sectorsToMB = (x) -> Math.floor x * 512 / (1000 * 1000)
-
-      @loadData()
+      @loadMain()
+      @loadEvents()
       eventbus.receivers.push =>
         @pollEvents()
 
