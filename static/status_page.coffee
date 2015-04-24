@@ -1,5 +1,4 @@
-define(['knockout', 'moment', 'eventbus', "text!./status_page.html"],\
-        (ko, moment, eventbus, pageHtml) ->
+define ['knockout', 'moment', 'eventbus', "text!./status_page.html"], (ko, moment, eventbus, pageHtml) ->
 
   MAX_EVENTS = 50
   EVENT_POLLING_PERIOD = 4000
@@ -57,4 +56,3 @@ define(['knockout', 'moment', 'eventbus', "text!./status_page.html"],\
     template: pageHtml
   }
 
-)

@@ -1,4 +1,6 @@
-define(['sockjs'], (SockJS) ->
+define ['sockjs'], (SockJS) ->
+
+  delay = (ms, func) -> setTimeout func, ms
 
   class EventBus
     constructor: () ->
@@ -27,4 +29,3 @@ define(['sockjs'], (SockJS) ->
   eventbus.connect()
   return eventbus
 
-)

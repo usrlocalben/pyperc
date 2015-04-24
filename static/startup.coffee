@@ -1,7 +1,5 @@
-define(['jquery', 'knockout', 'moment', 'sockjs', 'bootstrap'],\
-        ($, ko, moment, SockJS) ->
+define ['jquery', 'knockout', 'bootstrap'], ($, ko) ->
 
-  ko.components.register('status_page', {require: 'static/status_page'})
+  ko.components.register('status_page', {require: 'status_page'})
   ko.applyBindings({})
 
-)

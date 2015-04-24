@@ -1,5 +1,5 @@
 require = {
-  baseUrl: 'static',
+  baseUrl: 'static'
   paths: {
     text: 'requirejs-text/text'
     sockjs: 'sockjs/sockjs.min'
@@ -10,7 +10,7 @@ require = {
     knockout: 'knockout/dist/knockout'
     bootstrap: 'bootstrap/dist/js/bootstrap.min'
     crossroads: 'crossroads/dist/crossroads.min'
-  },
+  }
   shim: {
     bootstrap: {deps: ['jquery']}
   }
