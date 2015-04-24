@@ -1,17 +1,3 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0">
-    <title>pyPerc dashboard</title>
-
-    <!-- bootstrap -->
-    <link rel="stylesheet" href="/static/bootswatch/superhero/bootstrap.min.css">
-    <link rel="stylesheet" href="/static/fontawesome/css/font-awesome.min.css">
-</head>
-<body>
-<div class="container">
 <h1>pyPerc status</h1>
 
 <div class="row">
@@ -84,8 +70,8 @@
                 <span data-bind="if: !member">Unassigned</span>
                 </p>
                 <p>
-                Raw sectors: <strong data-bind="text: $root.numberWithCommas(size_raw)"></strong><br>
-                Size: <strong data-bind="text: $root.numberWithCommas($root.sectorsToMB(size_raw))"></strong> MB
+                Raw sectors: <strong data-bind="text: $component.numberWithCommas(size_raw)"></strong><br>
+                Size: <strong data-bind="text: $component.numberWithCommas($component.sectorsToMB(size_raw))"></strong> MB
                 </p>
             </div>
             <div class="col-sm-3">
@@ -136,7 +122,3 @@
 </tbody>
 </table>
 </div>
-</div>
-<script data-main="/static/dashboard" src="/static/require.js"></script>
-</body>
-</html>

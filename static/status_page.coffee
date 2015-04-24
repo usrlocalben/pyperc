@@ -1,23 +1,39 @@
-requirejs.config {
-  baseUrl: 'static',
-  paths: {
-    sockjs: 'sockjs/sockjs.min',
-    moment: 'moment/min/moment.min',
-    jquery: 'jquery/dist/jquery.min',
-    knockout: 'knockout/dist/knockout',
-    bootstrap: 'bootstrap/dist/js/bootstrap.min'
-  }
-}
-
-require(['jquery', 'bootstrap', 'knockout', 'moment', 'sockjs'],\
-        (jquery, bootstrap, ko, moment, SockJS) ->
+define(['knockout', 'moment', 'sockjs', "text!./status_page.html"],\
+        (ko, moment, SockJS, pageHtml) ->
 
   MAX_EVENTS = 50
   EVENT_POLLING_PERIOD = 4000
 
   delay = (ms, func) -> setTimeout func, ms
 
-  class ViewModel
+  class EventBus
+    constructor: () ->
+      @attempts = 0
+      @attempt_delay = 500
+      @socket = null
+      @receivers = []
+
+      @connect = ->
+        console.log('Connecting eventbus')
+        @socket = new SockJS('/chan')
+        if @attempt_delay < 15000
+          @attempt_delay *= 2
+        @attempts += 1
+        @socket.onopen = ->
+          @attempts = 0
+          @attempt_delay = 500
+        @socket.onclose = ->
+          @socket = null
+          delay @attempt_delay, @connect
+        @socket.onmessage = (e) ->
+          for item, idx in @receivers
+            item?(e)
+
+  if !window.eventbus?
+    window.eventbus = new EventBus()
+    window.eventbus.connect()
+
+  class StatusPageViewModel
     constructor: () ->
       @last_event = 0
       @events = ko.observableArray()
@@ -59,29 +75,14 @@ require(['jquery', 'bootstrap', 'knockout', 'moment', 'sockjs'],\
 
       @sectorsToMB = (x) -> Math.floor x * 512 / (1000 * 1000)
 
-  vm = new ViewModel()
-  ko.applyBindings vm
+      @loadData()
+      if window.eventbus?
+        window.eventbus.receivers.push =>
+          @pollEvents()
 
-  attempts = 0
-  attempt_delay = 500
-  socket = null
-
-  connectEventBus = ->
-    socket = new SockJS('/chan')
-    if attempt_delay < 15000
-      attempt_delay *= 2
-    attempts += 1
-    socket.onopen = ->
-      attempts = 0
-      attempt_delay = 500
-    socket.onclose = ->
-      socket = null
-      delay attempt_delay, connectEventBus
-    socket.onmessage = (e) ->
-      vm.pollEvents()
-
-  $ ->
-    vm.loadData()
-    connectEventBus()
+  return {
+    viewModel: StatusPageViewModel,
+    template: pageHtml
+  }
 
 )

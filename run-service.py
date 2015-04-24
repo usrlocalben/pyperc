@@ -128,20 +128,24 @@ static.putChild("moment", File("bower_components/moment"))
 static.putChild("sockjs", File("bower_components/sockjs"))
 static.putChild("knockout", File("bower_components/knockout"))
 static.putChild("bootstrap", File("bower_components/bootstrap"))
+static.putChild("requirejs", File("bower_components/requirejs"))
 static.putChild("bootswatch", File("bower_components/bootswatch"))
 static.putChild("fontawesome", File("bower_components/fontawesome"))
-static.putChild("dashboard.js", File("static/dashboard.js"))
-static.putChild("require.js", File("static/require.js"))
+static.putChild("requirejs-text", File("bower_components/requirejs-text"))
+
+static.putChild("startup.js", File("static/startup.js"))
+static.putChild("status_page.js", File("static/status_page.js"))
+static.putChild("status_page.html", File("static/status_page.html"))
+static.putChild("require.config.js", File("static/require.config.js"))
 
 api = Resource()
 api.putChild("events", PercApiEvents())
 api.putChild("adapter", PercApiInfo())
 
 root = Resource()
-root.putChild("", Redirect('/home'))
+root.putChild("", File("static/index.html"))
 root.putChild("api", api)
 root.putChild("static", static)
-root.putChild("home", File("static/dashboard.html"))
 root.putChild("chan", SockJSResource(Factory.forProtocol(EventBus)))
 
 for address in LISTEN_ADDRESS.split(','):
