@@ -60,8 +60,6 @@ class MegaCLI(object):
             current_pd_slot_id = None
             current_pd_device_id = None
 
-            pd_to_ld = {}
-
             ldmap = {}
 
             for line in lines:
@@ -188,13 +186,14 @@ class MegaCLI(object):
 
 
         m = {
-             'Product Name'     : 'product'
-            ,'Serial No'        : 'serial_number'
-            ,'FW Package Build' : 'firmware'
+            'Product Name': 'product',
+            'Serial No': 'serial_number',
+            'FW Package Build': 'firmware',
         }
-        for l,r in ( megasplit(s) for s in sections['Versions'] if s != '' ):
-            if l not in m: raise NameError("unhandled adapter attribute pci info '%s'='%s'" % (l,r))
-            adapter_details[ m[l] ] = r
+        for l, r in (megasplit(s) for s in sections['Versions'] if s):
+            if l not in m:
+                raise NameError("unhandled adapter attribute pci info '%s'='%s'" % (l, r))
+            adapter_details[m[l]] = r
 
 
         block = "\n".join(sections['PCI Info'])
@@ -207,12 +206,12 @@ class MegaCLI(object):
             'Device Id': 'pci_device',
             'SubVendorId': 'pci_subvendor',
             'SubDeviceId': 'pci_subdevice',
-            'Controller Id': 'controller_id', # '0000'
+            'Controller Id': 'controller_id',   # '0000'
         }
-
-        for l,r in ( megasplit(s) for s in chunks[0].split("\n") if s != '' ):
-            if l not in m: raise NameError("unhandled adapter attribute pci info '%s'='%s'" % (l,r))
-            adapter_details[ m[l] ] = r
+        for l, r in (megasplit(s) for s in chunks[0].split("\n") if s):
+            if l not in m:
+                raise NameError("unhandled adapter attribute pci info '%s'='%s'" % (l, r))
+            adapter_details[m[l]] = r
 
 
         # chunk[3] has the list of raw sas ports and their sas addresses
@@ -221,7 +220,7 @@ class MegaCLI(object):
         portlines.pop(0) # 'Port  :  Address'
         adapter_details['portlist'] = {}
         for s in portlines:
-            parts = re.split(r"\s+",s,2) # split on whitespace, "0        1221000000000000"
+            parts = re.split(r"\s+", s, 2)  # split on whitespace, "0        1221000000000000"
             l = parts[0]
             r = parts[1]
             adapter_details['portlist'][l] = r
@@ -244,13 +243,13 @@ class MegaCLI(object):
              'Temperature sensor for ROC'        : ('has_sensor_roc'        ,decode_present),
              'Temperature sensor for controller' : ('has_sensor_controller' ,decode_present),
         }
-        for l,r in ( megasplit(s) for s in sections['HW Configuration'] if s != '' ):
-            if l not in m: raise NameError("unhandled adapter attribute hw config '%s'='%s'" % (l,r))
+        for l, r in (megasplit(s) for s in sections['HW Configuration'] if s):
+            if l not in m:
+                raise NameError("unhandled adapter attribute hw config '%s'='%s'" % (l, r))
             setting = m[l]
-            if setting is None: continue
-            key,xform = setting
-            adapter_details[key] = xform(r)
-
+            if setting:
+                key, xform = setting
+                adapter_details[key] = xform(r)
 
 
         m = {
@@ -295,24 +294,25 @@ class MegaCLI(object):
             'BIOS Error Handling'             : None, # 'Stop On Errors'
             'Current Boot Mode'               : None, # 'Normal'
         }
-        for l,r in ( megasplit(s) for s in sections['Settings'] if s != '' ):
-            if l not in m: raise NameError("unhandled adapter settings attribute '%s'='%s'" % (l,r))
+        for l, r in (megasplit(s) for s in sections['Settings'] if s):
+            if l not in m:
+                raise NameError("unhandled adapter settings attribute '%s'='%s'" % (l, r))
             setting = m[l]
-            if setting is None: continue
-            key,xform = setting
-            config_details[key] = xform(r)
+            if setting:
+                key, xform = setting
+                config_details[key] = xform(r)
 
 
         #----------------------------------------------------------------
         # i will ignore everything here except for the raid level list
         # this also assumes that the first line of this block is the RAID Levels Supported: line
-        l,r = megasplit(sections['Capabilities'][0])
+        l, r = megasplit(sections['Capabilities'][0])
         adapter_details['raidlevels'] = r.split(", ")
 
 
         #----------------------------------------------------------------
         # assume first line is 'ecc bucket count'
-        l,r = megasplit(sections['Status'][0])
+        l, r = megasplit(sections['Status'][0])
         adapter_details['ecc_bucket_count'] = int(r)
 
 
@@ -322,11 +322,13 @@ class MegaCLI(object):
 
 
         #----------------------------------------------------------------
-        for l,r in ( megasplit(s) for s in sections['Error Counters'] if s != '' ):
-            if   l == 'Memory Correctable Errors':   config_details['memory_errors_correctable'] = decode_int(r)
-            elif l == 'Memory Uncorrectable Errors': config_details['memory_errors_uncorrectable'] = decode_int(r)
+        for l, r in (megasplit(s) for s in sections['Error Counters'] if s):
+            if l == 'Memory Correctable Errors':
+                config_details['memory_errors_correctable'] = decode_int(r)
+            elif l == 'Memory Uncorrectable Errors':
+                config_details['memory_errors_uncorrectable'] = decode_int(r)
             else:
-                raise NameError("unhandled adapter attribute '%s'='%s'"%(l,r))
+                raise NameError("unhandled adapter attribute '%s'='%s'" % (l, r))
 
         return adapter_details, config_details
 
@@ -343,7 +345,7 @@ class MegaCLI(object):
         lines.pop(0) #'Virtual Drive: 0 (Target Id: 0)'
 
         a = {}
-        for l,r in ( megasplit(l) for l in lines if l != '' ):
+        for l, r in (megasplit(l) for l in lines if l):
             a['id'] = target_id #ldid
             if   l == 'Name':                      a['name']                 = '(unnamed)' if r=='' else r
             elif l == 'RAID Level':                a['raid_level']           = decode_raidlevel(r)
@@ -369,14 +371,14 @@ class MegaCLI(object):
             elif l == 'Is VD Cached':              pass # 'No'
             elif l == 'Sector Size':               a['sector_size'] = decode_int(r) #'512'
             else:
-                raise ValueError("unknown LD attribute '%s'='%s'"%(l,r))
+                raise ValueError("unknown LD attribute '%s'='%s'" % (l, r))
         #endfor lines
 
         return a
 
 
     def get_event_markers(self):
-        lines = self.megarun(['-AdpEventLog','-GetEventLogInfo'])
+        lines = self.megarun(['-AdpEventLog', '-GetEventLogInfo'])
         lines.pop(0) # ''
         lines.pop(0) # 'Adapter #0'
         lines.pop(0) # ''
@@ -401,11 +403,11 @@ class MegaCLI(object):
 
 
     def get_rebuild_progress(self, slot):
-        lines = self.megarun(['-PDRbld','-ShowProg','-PhysDrv',"[:"+str(slot)+"]"])
+        lines = self.megarun(['-PDRbld', '-ShowProg', '-PhysDrv', "[:"+str(slot)+"]"])
         # complete: ['                                     ', 'Device(Encl-N/A Slot-2) is not in rebuild process', '']
         res = lines[1]
         if res.endswith('is not in rebuild process'):
-            return 100,0
+            return 100, 0
 
         # forgot to add an example of the in-progress output :(
         blah = res.split(' ')
@@ -429,18 +431,18 @@ class MegaCLI(object):
 
             pd_info = {}
             for line in lines:
-                if ':' not in line: continue
-                left, right = megasplit(line)
+                if ':' in line:
+                    left, right = megasplit(line)
 
-                # each PD block starts with this entry
-                if left == 'Enclosure Device ID' and pd_info:
-                    yield pd_info
-                    pd_info = {}
+                    # each PD block starts with this entry
+                    if left == 'Enclosure Device ID' and pd_info:
+                        yield pd_info
+                        pd_info = {}
 
-                if line.startswith('Inquiry Data'):
-                    pd_info['Inquiry Data'] = line[14:] # see example above
-                else:
-                    pd_info[left] = right
+                    if line.startswith('Inquiry Data'):
+                        pd_info['Inquiry Data'] = line[14:] # see example above
+                    else:
+                        pd_info[left] = right
 
             #endfor lines
             if pd_info:
@@ -454,7 +456,6 @@ class MegaCLI(object):
             ser = pd['Inquiry Data'][0:20].strip()
             mod = pd['Inquiry Data'][20:60].strip()
             ver = pd['Inquiry Data'][60:].strip()
-            #ser,mod,ver = re.split("\s+",pd['Inquiry Data'])
 
             a = {
                 'enclosure'       : '' if pd['Enclosure Device ID'] == 'N/A' else pd['Enclosure Device ID'],
@@ -490,7 +491,7 @@ class MegaCLI(object):
                 a['rebuild_elapsed'] = elapsed
 
             pdinfo.append(a)
-            pdidx[ (a['slot'],a['device'],) ] = a
+            pdidx[(a['slot'], a['device'])] = a
 
         #endfor raw pdlist
         return pdinfo, pdidx
@@ -508,7 +509,6 @@ class MegaCLI(object):
 
     def dump_events_deleted(self, filename):
         self.megarun(['-AdpEventLog', '-IncludeDeleted', '-f', filename])
-
 
     def maybe_set_time(self, ntp_host='127.0.0.1', ntp_timeout=5):
         try:

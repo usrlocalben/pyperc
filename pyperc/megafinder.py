@@ -2,6 +2,7 @@
 import os
 import re
 
+
 def megaraid_devs():
 
     def find_megaraid_devices():
@@ -28,9 +29,8 @@ def megaraid_devs():
     target_strings = [item for item in os.listdir(megapath + '/device/') if item.startswith('target')]
 
     def sys_blocks():
-        blockdevs = os.listdir('/sys/block/')
-        for dev in blockdevs:
-            yield dev, os.readlink('/sys/block/' + dev)
+        for devname in os.listdir('/sys/block/'):
+            yield devname, os.readlink('/sys/block/' + devname)
    
     # filter /sys/block/ looking for any megaraid target strings
     mega_blocks = (item for item in sys_blocks() if any(target in item[1] for '/'+target+'/' in target_strings))
@@ -46,11 +46,9 @@ def megaraid_devs():
 def proc_partitions():
     with open('/proc/partitions', 'r') as fd:
         for line in fd:
-            try:
-                major, minor, blocks, name = re.match(r"\W*([0-9]+)\W+([0-9]+)\W+([0-9]+)\W+(.*)$", line).groups()
-            except:
-                pass
-            else:
+            match = re.match(r"\W*([0-9]+)\W+([0-9]+)\W+([0-9]+)\W+(.*)$", line)
+            if match:
+                major, minor, blocks, name = match.groups()
                 yield int(major), int(minor), int(blocks), name
 
 

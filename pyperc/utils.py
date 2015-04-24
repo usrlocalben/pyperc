@@ -1,6 +1,4 @@
 
-import os
-import re
 from datetime import datetime
 
 def megasplit(line):

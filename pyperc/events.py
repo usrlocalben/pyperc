@@ -7,6 +7,7 @@ from decoders import *
 from event_codes import MEGA_EVENT_CODES
 from utils import megasplit, from_megadate
 
+
 class MegaEvent(object):
     def __init__(self, id, code, level, locale, description, data, time=None, sslr=None):
         if time is None and sslr: pass
@@ -37,7 +38,7 @@ class MegaEvent(object):
             'description': self.description,
         }
         if self.time:
-            data['time'] = self.time.isoformat() #to_megadate(self.time) #.isoformat()
+            data['time'] = self.time.isoformat()
         elif self.sslr:
             data['sslr'] = self.sslr
         return data
