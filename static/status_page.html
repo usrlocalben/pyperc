@@ -105,13 +105,13 @@
     <td class="text-center" data-bind="text: id"></td>
     <td class="text-center">
         <span data-bind="if: 'time' in $data">
-            <span data-bind="text: moment(time).format('MMM Do YYYY')"></span>
+            <span data-bind="text: $component.moment(time).format('MMM Do YYYY')"></span>
         </span>
         <span data-bind="if: !('time' in $data)">rtc not set</span>
     </td>
     <td class="text-center">
         <span data-bind="if: 'time' in $data">
-            <span data-bind="text: moment(time).format('HH:mm:ss')"></span>
+            <span data-bind="text: $component.moment(time).format('HH:mm:ss')"></span>
         </span>
         <span data-bind="if: !('time' in $data)">
             +<span data-bind="text: sslr"></span>s

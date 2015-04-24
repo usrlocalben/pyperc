@@ -14,6 +14,9 @@ define ['knockout', 'moment', 'eventbus', "text!./status_page.html"], (ko, momen
       @devices = ko.observableArray()
       @loaded = ko.observable(false)
 
+      @moment = (x) ->
+        moment(x)
+
       @loadData = =>
         $.get '/api/adapter/', {}, (data, status) =>
           @adapter(data.ad)
