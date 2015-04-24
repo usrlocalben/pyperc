@@ -1,37 +1,10 @@
-define(['knockout', 'moment', 'sockjs', "text!./status_page.html"],\
-        (ko, moment, SockJS, pageHtml) ->
+define(['knockout', 'moment', 'eventbus', "text!./status_page.html"],\
+        (ko, moment, eventbus, pageHtml) ->
 
   MAX_EVENTS = 50
   EVENT_POLLING_PERIOD = 4000
 
   delay = (ms, func) -> setTimeout func, ms
-
-  class EventBus
-    constructor: () ->
-      @attempts = 0
-      @attempt_delay = 500
-      @socket = null
-      @receivers = []
-
-      @connect = ->
-        console.log('Connecting eventbus')
-        @socket = new SockJS('/chan')
-        if @attempt_delay < 15000
-          @attempt_delay *= 2
-        @attempts += 1
-        @socket.onopen = ->
-          @attempts = 0
-          @attempt_delay = 500
-        @socket.onclose = ->
-          @socket = null
-          delay @attempt_delay, @connect
-        @socket.onmessage = (e) ->
-          for item, idx in @receivers
-            item?(e)
-
-  if !window.eventbus?
-    window.eventbus = new EventBus()
-    window.eventbus.connect()
 
   class StatusPageViewModel
     constructor: () ->
@@ -76,9 +49,8 @@ define(['knockout', 'moment', 'sockjs', "text!./status_page.html"],\
       @sectorsToMB = (x) -> Math.floor x * 512 / (1000 * 1000)
 
       @loadData()
-      if window.eventbus?
-        window.eventbus.receivers.push =>
-          @pollEvents()
+      eventbus.receivers.push =>
+        @pollEvents()
 
   return {
     viewModel: StatusPageViewModel,

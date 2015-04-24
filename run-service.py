@@ -122,6 +122,7 @@ static.putChild("fontawesome", File("bower_components/fontawesome"))
 static.putChild("requirejs-text", File("bower_components/requirejs-text"))
 
 static.putChild("startup.js", File("static/startup.js"))
+static.putChild("eventbus.js", File("static/eventbus.js"))
 static.putChild("status_page.js", File("static/status_page.js"))
 static.putChild("status_page.html", File("static/status_page.html"))
 static.putChild("require.config.js", File("static/require.config.js"))
