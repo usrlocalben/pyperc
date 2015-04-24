@@ -12,6 +12,7 @@ define ['knockout', 'moment', 'eventbus', "text!./status_page.html"], (ko, momen
       @adapter = ko.observable()
       @volumes = ko.observableArray()
       @devices = ko.observableArray()
+      @loaded = ko.observable(false)
 
       @loadData = =>
         $.get '/api/adapter/', {}, (data, status) =>
@@ -26,6 +27,7 @@ define ['knockout', 'moment', 'eventbus', "text!./status_page.html"], (ko, momen
               item.member = false
             @devices.push item
           )
+          @loaded(true)
 
         $.get '/api/events/', {limit: MAX_EVENTS}, (data, status) =>
           @last_event = 0
