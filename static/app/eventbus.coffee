@@ -9,19 +9,22 @@ define ['sockjs'], (SockJS) ->
       @socket = null
       @receivers = []
 
-      @connect = ->
-        console.log('Connecting eventbus')
+      @connect = =>
+        console.log('eventbus: Connecting, attempt ' + @attempts)
         @socket = new SockJS('/chan')
         if @attempt_delay < 15000
           @attempt_delay *= 2
         @attempts += 1
-        @socket.onopen = ->
+        @socket.onopen = =>
+          console.log('eventbus: Connected')
           @attempts = 0
           @attempt_delay = 500
-        @socket.onclose = ->
+        @socket.onclose = =>
+          console.log('eventbus: Closed')
           @socket = null
           delay @attempt_delay, @connect
-        @socket.onmessage = (e) ->
+        @socket.onmessage = (e) =>
+          console.log('eventbus: Message Received', e)
           for item, idx in @receivers
             item?(e)
 
