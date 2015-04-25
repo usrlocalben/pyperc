@@ -15,6 +15,9 @@ var gulp = require('gulp'),
     htmlreplace = require('gulp-html-replace'),
     coffee = require('gulp-coffee');
 
+//var browserSync = require('browser-sync').create();
+
+
 var base_bower = 'bower_components';
 var base_static = 'static';
 
@@ -94,3 +97,18 @@ gulp.task('default', ['html', 'js', 'css'], function (callback) {
     console.log('\nPlaced optimized files in ' + chalk.magenta('dist/\n'));
 });
 
+/*
+gulp.task('browser-sync', function () {
+    browserSync.init({
+        server: {
+            basedir: './dist'
+        }
+    });
+});
+*/
+
+gulp.task('watch', function () {
+    gulp.watch('static/**/*.coffee', function () {
+        gulp.run('js');
+    });
+});
