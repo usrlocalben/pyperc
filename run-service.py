@@ -115,7 +115,7 @@ api.putChild("events", PercApiEvents())
 api.putChild("adapter", PercApiInfo())
 
 root = Resource()
-root.putChild("", Redirect("static/index.html"))
+root.putChild("", Redirect("static/"))
 root.putChild("api", api)
 root.putChild("static", File("dist"))   # compiled
 #root.putChild("static", File("static"))    # source
