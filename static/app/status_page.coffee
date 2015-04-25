@@ -1,4 +1,4 @@
-define ['knockout', 'moment', 'eventbus', 'text!./status_page.html', 'ko.plus'], (ko, moment, eventbus, pageHtml) ->
+define ['knockout', 'moment', 'app/eventbus', 'text!./status_page.html', 'ko.plus'], (ko, moment, eventbus, pageHtml) ->
 
   MAX_EVENTS = 50
   EVENT_POLLING_PERIOD = 4000

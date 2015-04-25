@@ -1,5 +1,10 @@
 *.py[co]
 *.wsgic
+*.swp
+
+/static/app/*.js
 
 bower_components/
-venv/
+/node_modules
+/dist
+/venv

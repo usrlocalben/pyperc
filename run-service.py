@@ -110,32 +110,15 @@ class PercApiEvents(Resource):
             })
 
 
-static = Resource()
-static.putChild("jquery", File("bower_components/jquery"))
-static.putChild("moment", File("bower_components/moment"))
-static.putChild("sockjs", File("bower_components/sockjs"))
-static.putChild("ko.plus", File("bower_components/ko.plus"))
-static.putChild("knockout", File("bower_components/knockout"))
-static.putChild("bootstrap", File("bower_components/bootstrap"))
-static.putChild("requirejs", File("bower_components/requirejs"))
-static.putChild("bootswatch", File("bower_components/bootswatch"))
-static.putChild("fontawesome", File("bower_components/fontawesome"))
-static.putChild("requirejs-text", File("bower_components/requirejs-text"))
-
-static.putChild("startup.js", File("static/startup.js"))
-static.putChild("eventbus.js", File("static/eventbus.js"))
-static.putChild("status_page.js", File("static/status_page.js"))
-static.putChild("status_page.html", File("static/status_page.html"))
-static.putChild("require.config.js", File("static/require.config.js"))
-
 api = Resource()
 api.putChild("events", PercApiEvents())
 api.putChild("adapter", PercApiInfo())
 
 root = Resource()
-root.putChild("", File("static/index.html"))
+root.putChild("", Redirect("static/index.html"))
 root.putChild("api", api)
-root.putChild("static", static)
+root.putChild("static", File("dist"))   # compiled
+#root.putChild("static", File("static"))    # source
 root.putChild("chan", SockJSResource(Factory.forProtocol(EventBus)))
 
 for address in LISTEN_ADDRESS.split(','):

@@ -6,12 +6,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0">
     <title>pyPerc</title>
 
-    <!-- bootstrap -->
-    <link rel="stylesheet" href="/static/bootswatch/superhero/bootstrap.min.css">
-    <link rel="stylesheet" href="/static/fontawesome/css/font-awesome.min.css">
+    <!-- build:css -->
+    <link rel="stylesheet" href="bower_components/bootswatch/superhero/bootstrap.min.css">
+    <link rel="stylesheet" href="bower_components/fontawesome/css/font-awesome.min.css">
+    <!-- endbuild -->
 
-    <script src="/static/require.config.js"></script>
-    <script src="/static/requirejs/require.js" data-main="startup"></script>
+    <!-- build:js -->
+    <script src="app/require.config.js"></script>
+    <script src="bower_components/requirejs/require.js" data-main="app/startup"></script>
+    <!-- endbuild -->
 </head>
 <body>
     <div id="page" class="container">
