@@ -24,9 +24,15 @@ define ['sockjs'], (SockJS) ->
           @socket = null
           delay @attempt_delay, @connect
         @socket.onmessage = (e) =>
-          console.log('eventbus: Message Received', e)
-          for item, idx in @receivers
-            item?(e)
+          msg = JSON.parse(e.data)
+          if msg.ch == 'beat'
+            console.log('eventbus: heartbeat \"' + msg.data + '\"')
+          else if msg.ch == 'hello'
+            console.log('eventbus says hello ' + msg.data)
+          else
+            console.log('eventbus: Message Received', e)
+            for item, idx in @receivers
+              item?(msg)
 
   eventbus = new EventBus()
   eventbus.connect()

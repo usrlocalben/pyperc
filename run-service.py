@@ -37,7 +37,7 @@ def poll_pyperc():
     pyperc.poll()
     new_event = pyperc.last_event()
     if new_event != last_event:
-        broadcast('come get em', connected_users)
+        bus_broadcast('events', {})
     reactor.callLater(PERC_POLL_PERIOD, poll_pyperc)
 
 reactor.callLater(0, poll_pyperc)
@@ -52,10 +52,20 @@ def limited_to(limit, iterable):
         total += 1
 
 
+def bus_message(channel, data):
+    return json.dumps({
+        'ch': channel,
+        'data': data
+    })
+
+def bus_broadcast(channel, data):
+    broadcast(bus_message(channel, data), connected_users)
+
 class EventBus(Protocol):
     def connectionMade(self):
         connected_users.add(self.transport)
         print 'join', self.transport.getPeer(), ' -- users online:', len(connected_users)
+        self.transport.write(bus_message('hello', 'welcome'))
 
     def dataReceived(self, data):
         print 'rx:', data
